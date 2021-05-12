@@ -23,7 +23,7 @@ function ValueSlider:render()
 			return Roact.createElement("ImageButton", {
 				Size = UDim2.new(1, 0, 0, 20),
 				Position = UDim2.new(0, 0, 1, 5),
-				AnchorPoint = Vector2.new(0, 0),
+				AnchorPoint = Vector2.new(),
 				Image = "rbxassetid://1357203924",
 				ImageColor3 = Color3.fromHSV(self.props.hue, self.props.sat, 1),
 				AutoButtonColor = false,

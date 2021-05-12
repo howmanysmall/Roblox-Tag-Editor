@@ -21,7 +21,7 @@ local function merge(orig, new)
 	return t
 end
 
-local TagList = Roact.Component:extend("TagList")
+local TagList = Roact.PureComponent:extend("TagList")
 TagList.defaultProps = {
 	Size = UDim2.fromScale(1, 1),
 }

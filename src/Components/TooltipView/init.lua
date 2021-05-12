@@ -14,7 +14,7 @@ local TextLabel = require(script.Parent.TextLabel)
 
 local TooltipGrey = Color3.fromRGB(238, 238, 238)
 
-local TooltipView = Roact.Component:extend("TooltipView")
+local TooltipView = Roact.PureComponent:extend("TooltipView")
 
 local ADDED_WIDTH = 40 or 79
 

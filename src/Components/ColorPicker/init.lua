@@ -9,7 +9,7 @@ local TextBox = require(script.TextBox)
 local ThemeContext = require(script.Parent.ThemeContext)
 local ValueSlider = require(script.ValueSlider)
 
-local ColorPicker = Roact.Component:extend("ColorPicker")
+local ColorPicker = Roact.PureComponent:extend("ColorPicker")
 
 function ColorPicker:init()
 	self:setState({
@@ -84,8 +84,7 @@ function ColorPicker:render()
 						[Roact.Event.InputEnded] = function(rbx, input)
 							if input.UserInputType == Enum.UserInputType.MouseButton1 and self.state.wheelMouseDown then
 								local x, y = input.Position.X, input.Position.Y
-								local pos = Vector2.new(x, y) - rbx.AbsolutePosition
-								pos = pos / rbx.AbsoluteSize
+								local pos = (Vector2.new(x, y) - rbx.AbsolutePosition) / rbx.AbsoluteSize
 								pos = Vector2.new(math.clamp(pos.X, 0, 1), math.clamp(pos.Y, 0, 1))
 								self:setState({
 									h = pos.X,
@@ -97,8 +96,7 @@ function ColorPicker:render()
 
 						[Roact.Event.InputChanged] = function(rbx, input)
 							if self.state.wheelMouseDown and input.UserInputType == Enum.UserInputType.MouseMovement then
-								local pos = Vector2.new(input.Position.X, input.Position.Y) - rbx.AbsolutePosition
-								pos = pos / rbx.AbsoluteSize
+								local pos = (Vector2.new(input.Position.X, input.Position.Y) - rbx.AbsolutePosition) / rbx.AbsoluteSize
 
 								self:setState({
 									h = pos.X,

@@ -211,15 +211,19 @@ local function mapDispatchToProps(dispatch)
 		close = function()
 			dispatch(Actions.OpenTagMenu(nil))
 		end,
+
 		iconPicker = function(tagMenu)
 			dispatch(Actions.ToggleIconPicker(tagMenu))
 		end,
+
 		colorPicker = function(tagMenu)
 			dispatch(Actions.ToggleColorPicker(tagMenu))
 		end,
+
 		groupPicker = function(tagMenu)
 			dispatch(Actions.ToggleGroupPicker(tagMenu))
 		end,
+
 		instanceView = function(tagMenu)
 			dispatch(Actions.OpenInstanceView(tagMenu))
 		end,

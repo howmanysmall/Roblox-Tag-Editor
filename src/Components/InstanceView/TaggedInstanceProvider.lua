@@ -2,7 +2,7 @@ local CollectionService = game:GetService("CollectionService")
 local Selection = game:GetService("Selection")
 local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 
-local TaggedInstanceProvider = Roact.Component:extend("TaggedInstanceProvider")
+local TaggedInstanceProvider = Roact.PureComponent:extend("TaggedInstanceProvider")
 
 function TaggedInstanceProvider:init()
 	self.nextId = 1
@@ -23,7 +23,7 @@ end
 
 function TaggedInstanceProvider:updateState(tagName)
 	local selected = {}
-	for _, instance in pairs(Selection:Get()) do
+	for _, instance in ipairs(Selection:Get()) do
 		selected[instance] = true
 	end
 

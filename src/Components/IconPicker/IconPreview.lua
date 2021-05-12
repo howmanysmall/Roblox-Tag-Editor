@@ -4,7 +4,7 @@ local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 local RoactRodux = require(script.Parent.Parent.Parent.Vendor.RoactRodux)
 local ThemedTextLabel = require(script.Parent.Parent.ThemedTextLabel)
 
-local IconPreview = Roact.Component:extend("IconPreview")
+local IconPreview = Roact.PureComponent:extend("IconPreview")
 
 function IconPreview:render()
 	local scaleFactor = 3

@@ -5,7 +5,7 @@ local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 local ThemedTextLabel = require(script.Parent.Parent.ThemedTextLabel)
 local ListItemChrome = require(script.Parent.Parent.ListItemChrome)
 
-local InstanceItem = Roact.Component:extend("InstanceItem")
+local InstanceItem = Roact.PureComponent:extend("InstanceItem")
 
 function InstanceItem:render()
 	local props = self.props

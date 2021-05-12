@@ -9,7 +9,7 @@ local ScrollingFrame = require(script.Parent.ScrollingFrame)
 local Search = require(script.Parent.Search)
 local ThemeContext = require(script.Parent.ThemeContext)
 
-local IconPicker = Roact.Component:extend("IconPicker")
+local IconPicker = Roact.PureComponent:extend("IconPicker")
 
 function IconPicker:init()
 	self.closeFunc = function()

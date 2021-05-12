@@ -5,7 +5,7 @@ local Janitor = require(script.Parent.Parent.Parent.Vendor.Janitor)
 local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 local TagManager = require(script.Parent.Parent.Parent.TagManager)
 
-local WorldProvider = Roact.Component:extend("WorldProvider")
+local WorldProvider = Roact.PureComponent:extend("WorldProvider")
 
 function WorldProvider:init()
 	self:setState({

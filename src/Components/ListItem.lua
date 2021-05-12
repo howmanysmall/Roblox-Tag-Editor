@@ -17,7 +17,7 @@ local function merge(orig, new)
 	return t
 end
 
-local Item = Roact.Component:extend("Item")
+local Item = Roact.PureComponent:extend("Item")
 
 function Item:render()
 	local props = self.props
