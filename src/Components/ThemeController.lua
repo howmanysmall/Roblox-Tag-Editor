@@ -2,7 +2,7 @@ local Roact = require(script.Parent.Parent.Vendor.Roact)
 local ThemeContext = require(script.Parent.ThemeContext)
 local getTheme = require(script.Parent.Parent.Utility.getTheme)
 
-local ThemeController = Roact.Component:extend("ThemeController")
+local ThemeController = Roact.PureComponent:extend("ThemeController")
 
 function ThemeController:init()
 	self:setState({
