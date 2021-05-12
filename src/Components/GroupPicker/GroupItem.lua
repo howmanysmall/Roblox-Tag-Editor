@@ -1,18 +1,17 @@
-local Modules = script.Parent.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
-local RoactRodux = require(Modules.RoactRodux)
-local TagManager = require(Modules.Plugin.TagManager)
-local Actions = require(Modules.Plugin.Actions)
-local Item = require(Modules.Plugin.Components.ListItem)
+local Actions = require(script.Parent.Parent.Parent.Actions)
+local Item = require(script.Parent.Parent.ListItem)
+local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
+local RoactRodux = require(script.Parent.Parent.Parent.Vendor.RoactRodux)
+local TagManager = require(script.Parent.Parent.Parent.TagManager)
 
 local function GroupItem(props)
 	return Roact.createElement(Item, {
-		Icon = 'folder',
+		Icon = "folder",
 		Text = props.Name,
 		Active = props.Active,
 		LayoutOrder = props.LayoutOrder,
 
-		leftClick = function(rbx)
+		leftClick = function()
 			TagManager.Get():SetGroup(props.Tag, props.Group)
 			props.close()
 		end,
@@ -34,6 +33,7 @@ local function mapDispatchToProps(dispatch)
 		close = function()
 			dispatch(Actions.ToggleGroupPicker(nil))
 		end,
+
 		delete = function(name)
 			TagManager.Get():DelGroup(name)
 		end,

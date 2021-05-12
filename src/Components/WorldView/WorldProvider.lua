@@ -1,71 +1,75 @@
-local Collection = game:GetService("CollectionService")
+local Workspace = game:GetService("Workspace")
+local CollectionService = game:GetService("CollectionService")
 
-local Modules = script.Parent.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
-
-local TagManager = require(Modules.Plugin.TagManager)
-local Maid = require(Modules.Plugin.Maid)
+local Janitor = require(script.Parent.Parent.Parent.Vendor.Janitor)
+local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
+local TagManager = require(script.Parent.Parent.Parent.TagManager)
 
 local WorldProvider = Roact.Component:extend("WorldProvider")
 
 function WorldProvider:init()
-	self.state = {
+	self:setState({
 		partsList = {},
-	}
+	})
 
 	self.nextId = 0
 	self.partIds = {}
 	self.trackedParts = {}
 	self.trackedTags = {}
-	self.instanceAddedConns = Maid.new()
-	self.instanceRemovedConns = Maid.new()
-	self.instanceAncestryChangedConns = Maid.new()
-	self.maid = Maid.new()
+	self.instanceAddedConns = Janitor.new()
+	self.instanceRemovedConns = Janitor.new()
+	self.instanceAncestryChangedConns = Janitor.new()
+	self.janitor = Janitor.new()
 
 	local function cameraAdded(camera)
-		self.maid.cameraMovedConn = nil
+		self.janitor:Remove("cameraMovedConn")
 		if camera then
-			local origPos = camera.CFrame.p
-			self.maid.cameraMovedConn = camera:GetPropertyChangedSignal("CFrame"):Connect(function()
-				local newPos = camera.CFrame.p
+			local origPos = camera.CFrame.Position
+			self.janitor:Add(camera:GetPropertyChangedSignal("CFrame"):Connect(function()
+				local newPos = camera.CFrame.Position
 				if (origPos - newPos).Magnitude > 50 then
 					origPos = newPos
 					self:updateParts()
 				end
-			end)
+			end), "Disconnect", "cameraMovedConn")
 		end
 	end
-	self.maid.cameraChangedConn = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(cameraAdded)
-	cameraAdded(workspace.CurrentCamera)
+
+	self.janitor:Add(Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(cameraAdded), "Disconnect", "cameraChangedConn")
+	cameraAdded(Workspace.CurrentCamera)
 end
 
 function WorldProvider:didMount()
 	local manager = TagManager.Get()
 
-	for name,_ in pairs(manager:GetTags()) do
+	for name, _ in pairs(manager:GetTags()) do
 		self:tagAdded(name)
 	end
+
 	self.onTagAddedConn = manager:OnTagAdded(function(name)
-		if manager.tags[name].Visible ~= false and manager.tags[name].DrawType ~= 'None' then
+		if manager.tags[name].Visible ~= false and manager.tags[name].DrawType ~= "None" then
 			self:tagAdded(name)
 			self:updateParts()
 		end
 	end)
+
 	self.onTagRemovedConn = manager:OnTagRemoved(function(name)
-		if manager.tags[name].Visible ~= false and manager.tags[name].DrawType ~= 'None' then
+		if manager.tags[name].Visible ~= false and manager.tags[name].DrawType ~= "None" then
 			self:tagRemoved(name)
 			self:updateParts()
 		end
 	end)
-	self.onTagChangedConn = manager:OnTagChanged(function(name, prop, value)
+
+	self.onTagChangedConn = manager:OnTagChanged(function(name)
 		local tag = manager.tags[name]
-		local wasVisible = (self.trackedTags[name] ~= nil)
-		local nowVisible = tag.DrawType ~= 'None' and tag.Visible ~= false
+		local wasVisible = self.trackedTags[name] ~= nil
+		local nowVisible = tag.DrawType ~= "None" and tag.Visible ~= false
 		if nowVisible and not wasVisible then
 			self:tagAdded(name)
 		elseif wasVisible and not nowVisible then
 			self:tagRemoved(name)
 		end
+
 		self:updateParts()
 	end)
 
@@ -93,51 +97,59 @@ function WorldProvider:updateParts()
 
 	local newList = {}
 
-	local cam = workspace.CurrentCamera
-	if not cam then return end
-	local camPos = cam.CFrame.p
+	local cam = Workspace.CurrentCamera
+	if not cam then
+		return
+	end
 
+	local camPos = cam.CFrame.Position
 	local function sortFunc(a, b)
 		return a.AngularSize > b.AngularSize
 	end
+
 	local function partAngularSize(pos, size)
 		local dist = (pos - camPos).Magnitude
 		local sizeM = size.Magnitude
 		return sizeM / dist
 	end
-	for obj,_ in pairs(self.trackedParts) do
+
+	for obj, _ in pairs(self.trackedParts) do
 		local class = obj.ClassName
-		if class == 'Model' then
+		if class == "Model" then
 			local primary = obj.PrimaryPart
 			if not primary then
-				local children = obj:GetChildren()
-				for i = 1, #children do
-					if children[i]:IsA("BasePart") then
-						primary = children[i]
+				for _, child in ipairs(obj:GetChildren()) do
+					if child:IsA("BasePart") then
+						primary = child
 						break
 					end
 				end
 			end
+
 			if primary then
 				local entry = {
 					AngularSize = partAngularSize(primary.Position, obj:GetExtentsSize()),
 					Instance = obj,
 				}
+
 				sortedInsert(newList, entry, sortFunc)
 			end
-		elseif class == 'Attachment' then
+		elseif class == "Attachment" then
 			local entry = {
 				AngularSize = partAngularSize(obj.WorldPosition, Vector3.new()),
 				Instance = obj,
 			}
+
 			sortedInsert(newList, entry, sortFunc)
 		else -- assume part
 			local entry = {
 				AngularSize = partAngularSize(obj.Position, obj.Size),
 				Instance = obj,
 			}
+
 			sortedInsert(newList, entry, sortFunc)
 		end
+
 		local size = #newList
 		while size > 500 do
 			newList[size] = nil
@@ -146,52 +158,53 @@ function WorldProvider:updateParts()
 	end
 
 	local adornMap = {}
-	for i = 1, #newList do
-		local tags = Collection:GetTags(newList[i].Instance)
+	for _, new in ipairs(newList) do
+		local tags = CollectionService:GetTags(new.Instance)
 		local outlines = {}
 		local boxes = {}
 		local icons = {}
 		local labels = {}
 		local spheres = {}
 		local anyAlwaysOnTop = false
-		for j = 1, #tags do
-			local tagName = tags[j]
+		for _, tagName in ipairs(tags) do
 			local tag = TagManager.Get().tags[tagName]
 			if self.trackedTags[tagName] and tag then
-				if tag.DrawType == 'Outline' then
-					outlines[#outlines+1] = tag.Color
-				elseif tag.DrawType == 'Box' then
-					boxes[#boxes+1] = tag.Color
-				elseif tag.DrawType == 'Icon' then
-					icons[#icons+1] = tag.Icon
-				elseif tag.DrawType == 'Text' then
-					labels[#labels+1] = tagName
-				elseif tag.DrawType == 'Sphere' then
-					spheres[#spheres+1] = tag.Color
+				if tag.DrawType == "Outline" then
+					table.insert(outlines, tag.Color)
+				elseif tag.DrawType == "Box" then
+					table.insert(boxes, tag.Color)
+				elseif tag.DrawType == "Icon" then
+					table.insert(icons, tag.Icon)
+				elseif tag.DrawType == "Text" then
+					table.insert(labels, tagName)
+				elseif tag.DrawType == "Sphere" then
+					table.insert(spheres, tag.Color)
 				end
+
 				if tag.AlwaysOnTop then
 					anyAlwaysOnTop = true
 				end
 			end
 		end
 
-		local partId = self.partIds[newList[i].Instance]
+		local partId = self.partIds[new.Instance]
 
 		if #outlines > 0 then
 			local r, g, b = 0, 0, 0
-			for i = 1, #outlines do
-				r = r + outlines[i].r
-				g = g + outlines[i].g
-				b = b + outlines[i].b
+			for _, outline in ipairs(outlines) do
+				r = r + outline.R
+				g = g + outline.G
+				b = b + outline.B
 			end
+
 			r = r / #outlines
 			g = g / #outlines
 			b = b / #outlines
 			local avg = Color3.new(r, g, b)
-			adornMap['Outline:'..partId] = {
+			adornMap["Outline:" .. partId] = {
 				Id = partId,
-				Part = newList[i].Instance,
-				DrawType = 'Outline',
+				Part = new.Instance,
+				DrawType = "Outline",
 				Color = avg,
 				AlwaysOnTop = anyAlwaysOnTop,
 			}
@@ -199,29 +212,30 @@ function WorldProvider:updateParts()
 
 		if #boxes > 0 then
 			local r, g, b = 0, 0, 0
-			for i = 1, #boxes do
-				r = r + boxes[i].r
-				g = g + boxes[i].g
-				b = b + boxes[i].b
+			for _, box in ipairs(boxes) do
+				r = r + box.R
+				g = g + box.G
+				b = b + box.B
 			end
+
 			r = r / #boxes
 			g = g / #boxes
 			b = b / #boxes
 			local avg = Color3.new(r, g, b)
-			adornMap['Box:'..partId] = {
+			adornMap["Box:" .. partId] = {
 				Id = partId,
-				Part = newList[i].Instance,
-				DrawType = 'Box',
+				Part = new.Instance,
+				DrawType = "Box",
 				Color = avg,
 				AlwaysOnTop = anyAlwaysOnTop,
 			}
 		end
 
 		if #icons > 0 then
-			adornMap['Icon:'..partId] = {
+			adornMap["Icon:" .. partId] = {
 				Id = partId,
-				Part = newList[i].Instance,
-				DrawType = 'Icon',
+				Part = new.Instance,
+				DrawType = "Icon",
 				Icon = icons,
 				AlwaysOnTop = anyAlwaysOnTop,
 			}
@@ -230,12 +244,13 @@ function WorldProvider:updateParts()
 		if #labels > 0 then
 			table.sort(labels)
 			if #icons > 0 then
-				labels[#labels+1] = ''
+				table.insert(labels, "")
 			end
-			adornMap['Text:'..partId] = {
+
+			adornMap["Text:" .. partId] = {
 				Id = partId,
-				Part = newList[i].Instance,
-				DrawType = 'Text',
+				Part = new.Instance,
+				DrawType = "Text",
 				TagName = labels,
 				AlwaysOnTop = anyAlwaysOnTop,
 			}
@@ -243,19 +258,20 @@ function WorldProvider:updateParts()
 
 		if #spheres > 0 then
 			local r, g, b = 0, 0, 0
-			for i = 1, #spheres do
-				r = r + spheres[i].r
-				g = g + spheres[i].g
-				b = b + spheres[i].b
+			for _, sphere in ipairs(spheres) do
+				r = r + sphere.R
+				g = g + sphere.G
+				b = b + sphere.B
 			end
+
 			r = r / #spheres
 			g = g / #spheres
 			b = b / #spheres
 			local avg = Color3.new(r, g, b)
-			adornMap['Sphere:'..partId] = {
+			adornMap["Sphere:" .. partId] = {
 				Id = partId,
-				Part = newList[i].Instance,
-				DrawType = 'Sphere',
+				Part = new.Instance,
+				DrawType = "Sphere",
 				Color = avg,
 				AlwaysOnTop = anyAlwaysOnTop,
 			}
@@ -265,14 +281,15 @@ function WorldProvider:updateParts()
 	-- make sure it's not the same as the current list
 	local isNew = false
 	local props = {
-		'Part',
-		'Icon',
-		'Id',
-		'DrawType',
-		'Color',
-		'TagName',
-		'AlwaysOnTop',
+		"Part",
+		"Icon",
+		"Id",
+		"DrawType",
+		"Color",
+		"TagName",
+		"AlwaysOnTop",
 	}
+
 	local oldMap = self.state.partsList
 	for key, newValue in pairs(adornMap) do
 		local oldValue = oldMap[key]
@@ -280,8 +297,7 @@ function WorldProvider:updateParts()
 			isNew = true
 			break
 		else
-			for i = 1, #props do
-				local prop = props[i]
+			for _, prop in ipairs(props) do
 				if newValue[prop] ~= oldValue[prop] then
 					isNew = true
 					break
@@ -289,8 +305,9 @@ function WorldProvider:updateParts()
 			end
 		end
 	end
+
 	if not isNew then
-		for key, oldValue in pairs(oldMap) do
+		for key in pairs(oldMap) do
 			if not adornMap[key] then
 				isNew = true
 				break
@@ -309,10 +326,10 @@ end
 
 function WorldProvider:instanceAdded(inst)
 	if self.trackedParts[inst] then
-		self.trackedParts[inst] = self.trackedParts[inst] + 1
+		self.trackedParts[inst] += 1
 	else
 		self.trackedParts[inst] = 1
-		self.nextId = self.nextId + 1
+		self.nextId += 1
 		self.partIds[inst] = self.nextId
 	end
 end
@@ -322,75 +339,83 @@ function WorldProvider:instanceRemoved(inst)
 		self.trackedParts[inst] = nil
 		self.partIds[inst] = nil
 	else
-		self.trackedParts[inst] = self.trackedParts[inst] - 1
+		self.trackedParts[inst] -= 1
 	end
 end
 
 local function isTypeAllowed(instance)
-	if instance.ClassName == 'Model' then return true end
-	if instance.ClassName == 'Attachment' then return true end
-	if instance:IsA("BasePart") then return true end
-	return false
+	return instance:IsA("Model") or instance:IsA("Attachment") or instance:IsA("BasePart")
 end
 
 function WorldProvider:tagAdded(tagName)
 	assert(not self.trackedTags[tagName])
 	self.trackedTags[tagName] = true
-	for _,obj in pairs(Collection:GetTagged(tagName)) do
+	for _, obj in ipairs(CollectionService:GetTagged(tagName)) do
 		if isTypeAllowed(obj) then
-			if obj:IsDescendantOf(workspace) then
+			if obj:IsDescendantOf(Workspace) then
 				self:instanceAdded(obj)
 			end
-			if not self.instanceAncestryChangedConns[obj] then
-				self.instanceAncestryChangedConns[obj] = obj.AncestryChanged:Connect(function()
-					if not self.trackedParts[obj] and obj:IsDescendantOf(workspace) then
+
+			if not self.instanceAncestryChangedConns:Get(obj) then
+				self.instanceAncestryChangedConns:Add(obj.AncestryChanged:Connect(function()
+					if not self.trackedParts[obj] and obj:IsDescendantOf(Workspace) then
 						self:instanceAdded(obj)
 						self:updateParts()
-					elseif self.trackedParts[obj] and not obj:IsDescendantOf(workspace) then
+					elseif self.trackedParts[obj] and not obj:IsDescendantOf(Workspace) then
 						self:instanceRemoved(obj)
 						self:updateParts()
 					end
-				end)
+				end), "Disconnect", obj)
 			end
 		end
 	end
-	self.instanceAddedConns[tagName] = Collection:GetInstanceAddedSignal(tagName):Connect(function(obj)
-		if not isTypeAllowed(obj) then return end
-		if obj:IsDescendantOf(workspace) then
+
+	self.instanceAddedConns:Add(CollectionService:GetInstanceAddedSignal(tagName):Connect(function(obj)
+		if not isTypeAllowed(obj) then
+			return
+		end
+
+		if obj:IsDescendantOf(Workspace) then
 			self:instanceAdded(obj)
 			self:updateParts()
 		else
 			print("outside workspace", obj)
 		end
-		if not self.instanceAncestryChangedConns[obj] then
-			self.instanceAncestryChangedConns[obj] = obj.AncestryChanged:Connect(function()
-				if not self.trackedParts[obj] and obj:IsDescendantOf(workspace) then
+
+		if not self.instanceAncestryChangedConns:Get(obj) then
+			self.instanceAncestryChangedConns:Add(obj.AncestryChanged:Connect(function()
+				if not self.trackedParts[obj] and obj:IsDescendantOf(Workspace) then
 					self:instanceAdded(obj)
 					self:updateParts()
-				elseif self.trackedParts[obj] and not obj:IsDescendantOf(workspace) then
+				elseif self.trackedParts[obj] and not obj:IsDescendantOf(Workspace) then
 					self:instanceRemoved(obj)
 					self:updateParts()
 				end
-			end)
+			end), "Disconnect", obj)
 		end
-	end)
-	self.instanceRemovedConns[tagName] = Collection:GetInstanceRemovedSignal(tagName):Connect(function(obj)
-		if not isTypeAllowed(obj) then return end
+	end), "Disconnect", tagName)
+
+	self.instanceRemovedConns:Add(CollectionService:GetInstanceRemovedSignal(tagName):Connect(function(obj)
+		if not isTypeAllowed(obj) then
+			return
+		end
+
 		self:instanceRemoved(obj)
 		self:updateParts()
-	end)
+	end), "Disconnect", tagName)
 end
 
 function WorldProvider:tagRemoved(tagName)
 	assert(self.trackedTags[tagName])
 	self.trackedTags[tagName] = nil
-	for _,obj in pairs(Collection:GetTagged(tagName)) do
-		if obj:IsDescendantOf(workspace) then
+	for _, obj in ipairs(CollectionService:GetTagged(tagName)) do
+		if obj:IsDescendantOf(Workspace) then
 			self:instanceRemoved(obj)
 		end
 	end
-	self.instanceAddedConns[tagName] = nil
-	self.instanceRemovedConns[tagName] = nil
+
+	self.instanceAddedConns:Remove(tagName)
+	self.instanceRemovedConns:Remove(tagName)
 end
 
 function WorldProvider:willUnmount()
@@ -398,9 +423,9 @@ function WorldProvider:willUnmount()
 	self.onTagRemovedConn:Disconnect()
 	self.onTagChangedConn:Disconnect()
 
-	self.instanceAddedConns:clean()
-	self.instanceRemovedConns:clean()
-	self.maid:clean()
+	self.instanceAddedConns:Destroy()
+	self.instanceRemovedConns:Destroy()
+	self.janitor:Destroy()
 end
 
 function WorldProvider:render()

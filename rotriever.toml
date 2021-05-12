@@ -1,0 +1,13 @@
+[package]
+name = "howmanysmall/RobloxTagEditor"
+version = "1.0.0"
+author = "howmanysmall"
+dependencies_root = "./src/Vendor"
+content_root = "./src/"
+license = "MIT"
+
+[dependencies]
+Roact = {git = "https://github.com/Roblox/roact"}
+RoactRodux = {git = "https://github.com/Roblox/roact-rodux"}
+Rodux = {git = "https://github.com/Roblox/rodux"}
+Janitor = {git = "https://github.com/howmanysmall/Janitor/"}

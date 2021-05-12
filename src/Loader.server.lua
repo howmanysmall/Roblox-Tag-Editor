@@ -12,7 +12,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local devSource = ServerStorage:FindFirstChild("TagEditor")
 
 -- The source that's shipped integrated into the plugin.
-local builtinSource = script.Parent.Parent
+local builtinSource = script.Parent
 
 -- `source` is where we should watch for changes.
 -- `currentRoot` is the clone we make of source to avoid require()
@@ -23,7 +23,7 @@ local currentRoot = source
 if useDevSource then
 	if devSource ~= nil then
 		source = devSource
-	currentRoot = source
+		currentRoot = source
 	else
 		warn("Tag editor development source is not present, running using built-in source.")
 	end
@@ -99,13 +99,14 @@ function PluginFacade:beforeUnload(callback)
 end
 
 function PluginFacade:_load(savedState)
-	local ok, result = pcall(require, currentRoot.Plugin.Main)
+	local ok, result = pcall(require, currentRoot.Main)
 
 	if not ok then
 		warn("Plugin failed to load: " .. result)
 		return
 	end
 
+	--- @type function
 	local Plugin = result
 
 	ok, result = pcall(Plugin, PluginFacade, savedState)
@@ -142,14 +143,13 @@ function PluginFacade:_watch(instance)
 		return
 	end
 
-	local connection1 = instance.Changed:Connect(function(prop)
+	local connection1 = instance.Changed:Connect(function()
 		print("Reloading due to", instance:GetFullName())
-
 		self:_reload()
 	end)
 
-	local connection2 = instance.ChildAdded:Connect(function(instance)
-		self:_watch(instance)
+	local connection2 = instance.ChildAdded:Connect(function(instance2)
+		self:_watch(instance2)
 	end)
 
 	local connections = {connection1, connection2}

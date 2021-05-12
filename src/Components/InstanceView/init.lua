@@ -1,11 +1,9 @@
-local Modules = script.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
-local RoactRodux = require(Modules.RoactRodux)
-local TagManager = require(Modules.Plugin.TagManager)
-local Actions = require(Modules.Plugin.Actions)
-
+local Actions = require(script.Parent.Parent.Actions)
 local InstanceList = require(script.InstanceList)
+local Roact = require(script.Parent.Parent.Vendor.Roact)
+local RoactRodux = require(script.Parent.Parent.Vendor.RoactRodux)
 local TaggedInstanceProvider = require(script.TaggedInstanceProvider)
+local TagManager = require(script.Parent.Parent.TagManager)
 
 local function InstanceView(props)
 	return Roact.createElement(TaggedInstanceProvider, {
@@ -19,7 +17,7 @@ local function InstanceView(props)
 				tagIcon = props.tagIcon,
 				close = props.close,
 			})
-		end
+		end,
 	})
 end
 

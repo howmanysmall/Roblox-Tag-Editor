@@ -11,37 +11,38 @@
     end
 ]]
 
-local Modules = script.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
+-- TODO: convert to Context?
 
-local rootKey = require(Modules.Plugin.Components.rootKey)
+local Roact = require(script.Parent.Parent.Vendor.Roact)
+local Scheduler = require(script.Parent.Parent.Scheduler)
+local rootKey = require(script.Parent.rootKey)
 
 local RootPortal = Roact.Component:extend("RootPortal")
 
 function RootPortal:init()
-    self._ref = self._context[rootKey]
+	self._ref = self._context[rootKey]
 end
 
 function RootPortal:render()
-    if self._ref.current then
-        return Roact.createElement(Roact.Portal, {
-            target = self._ref.current,
-        }, self.props[Roact.Children])
-    else
-        return nil
-    end
+	if self._ref.current then
+		return Roact.createElement(Roact.Portal, {
+			target = self._ref.current,
+		}, self.props[Roact.Children])
+	else
+		return nil
+	end
 end
 
 function RootPortal:didMount()
-    spawn(function()
-        if not self._unmounted then
-            self:setState({})
-        end
-    end)
+	Scheduler.Spawn(function()
+		if not self._unmounted then
+			self:setState({})
+		end
+	end)
 end
 
 function RootPortal:willUnmount()
-    self._unmounted = true
+	self._unmounted = true
 end
 
 return RootPortal

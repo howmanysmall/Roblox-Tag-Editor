@@ -1,0 +1,7 @@
+name = "mash'd"
+
+[[inputs]]
+glob = "Assets/**/*.png"
+codegen = true
+codegen-path = "src/ServerStorage/Repository/Shared/Assets.lua"
+codegen-base-path = "Assets"

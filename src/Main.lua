@@ -1,13 +1,11 @@
-local Modules = script.Parent.Parent
-local Roact = require(Modules.Roact)
-local Rodux = require(Modules.Rodux)
-local RoactRodux = require(Modules.RoactRodux)
-
-local App = require(script.Parent.Components.App)
-local Reducer = require(script.Parent.Reducer)
-local TagManager = require(script.Parent.TagManager)
 local Actions = require(script.Parent.Actions)
+local App = require(script.Parent.Components.App)
 local Config = require(script.Parent.Config)
+local Reducer = require(script.Parent.Reducer)
+local Roact = require(script.Parent.Vendor.Roact)
+local RoactRodux = require(script.Parent.Vendor.RoactRodux)
+local Rodux = require(script.Parent.Vendor.Rodux)
+local TagManager = require(script.Parent.TagManager)
 
 local function getSuffix(plugin)
 	if plugin.isDev then
@@ -22,21 +20,9 @@ end
 return function(plugin, savedState)
 	local displaySuffix, nameSuffix = getSuffix(plugin)
 
-	local toolbar = plugin:toolbar("Instance Tagging"..displaySuffix)
-
-	local toggleButton = plugin:button(
-		toolbar,
-		"Tag Window",
-		"Manipulate CollectionService tags",
-		"http://www.roblox.com/asset/?id=1367281857"
-	)
-
-	local worldViewButton = plugin:button(
-		toolbar,
-		"World View",
-		"Visualize tagged objects in the 3D view",
-		"http://www.roblox.com/asset/?id=1367285594"
-	)
+	local toolbar = plugin:toolbar("Instance Tagging" .. displaySuffix)
+	local toggleButton = plugin:button(toolbar, "Tag Window", "Manipulate CollectionService tags", "http://www.roblox.com/asset/?id=1367281857")
+	local worldViewButton = plugin:button(toolbar, "World View", "Visualize tagged objects in the 3D view", "http://www.roblox.com/asset/?id=1367285594")
 
 	local store = Rodux.Store.new(Reducer, savedState)
 
@@ -50,9 +36,9 @@ return function(plugin, savedState)
 	end)
 
 	local info = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Right, false, false, 0, 0)
-	local gui = plugin:createDockWidgetPluginGui("TagEditor"..nameSuffix, info)
-	gui.Name = "TagEditor"..nameSuffix
-	gui.Title = "Tag Editor"..displaySuffix
+	local gui = plugin:createDockWidgetPluginGui("TagEditor" .. nameSuffix, info)
+	gui.Name = "TagEditor" .. nameSuffix
+	gui.Title = "Tag Editor" .. displaySuffix
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	toggleButton:SetActive(gui.Enabled)
 
@@ -66,7 +52,7 @@ return function(plugin, savedState)
 	}, {
 		App = Roact.createElement(App, {
 			root = gui,
-		})
+		}),
 	})
 
 	local instance = Roact.mount(element, gui, "TagEditor")

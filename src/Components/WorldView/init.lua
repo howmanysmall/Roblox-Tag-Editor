@@ -1,7 +1,5 @@
-local Modules = script.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
-local RoactRodux = require(Modules.RoactRodux)
-
+local Roact = require(script.Parent.Parent.Vendor.Roact)
+local RoactRodux = require(script.Parent.Parent.Vendor.RoactRodux)
 local WorldVisual = require(script.WorldVisual)
 local WorldProvider = require(script.WorldProvider)
 
@@ -13,7 +11,7 @@ local function WorldView(props)
 					partsList = partsList,
 					tags = props.tags,
 				})
-			end
+			end,
 		})
 	else
 		return nil

@@ -1,38 +1,36 @@
-local Modules = script.Parent.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
-local ThemedTextLabel = require(Modules.Plugin.Components.ThemedTextLabel)
-local ScrollingFrame = require(Modules.Plugin.Components.ScrollingFrame)
-local Page = require(Modules.Plugin.Components.Page)
-
 local InstanceItem = require(script.Parent.InstanceItem)
+local Page = require(script.Parent.Parent.Page)
+local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
+local ScrollingFrame = require(script.Parent.Parent.ScrollingFrame)
+local ThemedTextLabel = require(script.Parent.Parent.ThemedTextLabel)
 
 local function InstanceList(props)
-	local children = {}
-
-	children.UIPadding = Roact.createElement("UIPadding", {
-		PaddingTop = UDim.new(0, 2),
-		PaddingBottom = UDim.new(0, 2),
-		PaddingLeft = UDim.new(0, 2),
-		PaddingRight = UDim.new(0, 2),
-	})
-
 	local parts = props.parts
 	local selected = props.selected
 
-	children.InstanceCount = Roact.createElement("Frame", {
-		Size = UDim2.new(1, 0, 0, 36),
-		LayoutOrder = -1,
-		BackgroundTransparency = 1.0,
-	}, {
-		Label = Roact.createElement(ThemedTextLabel, {
-			Position = UDim2.new(0, 16, 0, 4),
-			TextSize = 24,
-			Text = string.format("Instance List (%d instances)", #parts),
-			Font = Enum.Font.SourceSansLight,
+	local children = {
+		UIPadding = Roact.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 2),
+			PaddingBottom = UDim.new(0, 2),
+			PaddingLeft = UDim.new(0, 2),
+			PaddingRight = UDim.new(0, 2),
 		}),
-	})
 
-	for i,entry in pairs(parts) do
+		InstanceCount = Roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, 36),
+			LayoutOrder = -1,
+			BackgroundTransparency = 1,
+		}, {
+			Label = Roact.createElement(ThemedTextLabel, {
+				Position = UDim2.new(0, 16, 0, 4),
+				TextSize = 24,
+				Text = string.format("Instance List (%d instances)", #parts),
+				Font = Enum.Font.SourceSansLight,
+			}),
+		}),
+	}
+
+	for i, entry in ipairs(parts) do
 		local part = entry.instance
 		local id = entry.id
 		local path = entry.path
@@ -51,7 +49,6 @@ local function InstanceList(props)
 		visible = props.tagName ~= nil,
 		titleIcon = props.tagIcon,
 		title = tostring(props.tagName),
-
 		close = props.close,
 	}, {
 		Body = Roact.createElement(ScrollingFrame, {
@@ -59,7 +56,7 @@ local function InstanceList(props)
 			List = {
 				Padding = UDim.new(0, 1),
 			},
-		}, children)
+		}, children),
 	})
 end
 

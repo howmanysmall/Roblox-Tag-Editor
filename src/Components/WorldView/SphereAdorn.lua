@@ -1,14 +1,14 @@
-local Modules = script.Parent.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
+local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 
 local function SphereAdorn(props)
 	local adorn, cframe
-	if props.Adornee.ClassName == 'Attachment' then
+	if props.Adornee:IsA("Attachment") then
 		adorn = props.Adornee.Parent
 		cframe = props.Adornee.CFrame
 	else
 		adorn = props.Adornee
 	end
+
 	return Roact.createElement("SphereHandleAdornment", {
 		Adornee = adorn,
 		CFrame = cframe,

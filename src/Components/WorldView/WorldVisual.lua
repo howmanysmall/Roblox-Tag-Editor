@@ -1,12 +1,10 @@
 local CoreGui = game:GetService("CoreGui")
 
-local Modules = script.Parent.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
-
 local BoxAdorn = require(script.Parent.BoxAdorn)
-local SphereAdorn = require(script.Parent.SphereAdorn)
-local OutlineAdorn = require(script.Parent.OutlineAdorn)
 local IconAdorn = require(script.Parent.IconAdorn)
+local OutlineAdorn = require(script.Parent.OutlineAdorn)
+local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
+local SphereAdorn = require(script.Parent.SphereAdorn)
 local TextAdorn = require(script.Parent.TextAdorn)
 
 local function WorldVisual(props)
@@ -14,21 +12,22 @@ local function WorldVisual(props)
 
 	local children = {}
 
-	for key,entry in pairs(partsList) do
+	for key, entry in pairs(partsList) do
 		local elt
-		if entry.DrawType == 'Outline' then
+		if entry.DrawType == "Outline" then
 			elt = OutlineAdorn
-		elseif entry.DrawType == 'Box' then
+		elseif entry.DrawType == "Box" then
 			elt = BoxAdorn
-		elseif entry.DrawType == 'Sphere' then
+		elseif entry.DrawType == "Sphere" then
 			elt = SphereAdorn
-		elseif entry.DrawType == 'Icon' then
+		elseif entry.DrawType == "Icon" then
 			elt = IconAdorn
-		elseif entry.DrawType == 'Text' then
+		elseif entry.DrawType == "Text" then
 			elt = TextAdorn
 		else
-			error("Unknown DrawType: "..tostring(entry.DrawType))
+			error("Unknown DrawType: " .. tostring(entry.DrawType))
 		end
+
 		children[key] = Roact.createElement(elt, {
 			Adornee = entry.Part,
 			Icon = entry.Icon,

@@ -1,8 +1,7 @@
-local Modules = script.Parent.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
+local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 
 local function BoxAdorn(props)
-	if props.Adornee.ClassName == 'Attachment' then
+	if props.Adornee:IsA("Attachment") then
 		return Roact.createElement("BoxHandleAdornment", {
 			Adornee = props.Adornee.Parent,
 			CFrame = props.Adornee.CFrame,
@@ -11,6 +10,7 @@ local function BoxAdorn(props)
 			Color3 = props.Color,
 		})
 	end
+
 	return Roact.createElement("SelectionBox", {
 		LineThickness = 0.03,
 		SurfaceTransparency = 0.7,

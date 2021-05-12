@@ -1,5 +1,6 @@
 {
   "name": "Roblox-Tag-Editor",
+  "globIgnorePaths": ["**/*.spec.lua", "**/*.spec"],
   "tree": {
     "$className": "DataModel",
     "HttpService": {
@@ -11,19 +12,7 @@
     "ServerStorage": {
       "$className": "ServerStorage",
       "TagEditor": {
-        "$className": "Folder",
-        "Plugin": {
-          "$path": "src"
-        },
-        "Roact": {
-          "$path": "roact/src"
-        },
-        "Rodux": {
-          "$path": "rodux/lib"
-        },
-        "RoactRodux": {
-          "$path": "roact-rodux/lib"
-        }
+        "$path": "src"
       }
     }
   }

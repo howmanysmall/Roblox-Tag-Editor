@@ -1,17 +1,14 @@
 local Selection = game:GetService("Selection")
 local UserInputService = game:GetService("UserInputService")
 
-local Modules = script.Parent.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
-
-local ThemedTextLabel = require(Modules.Plugin.Components.ThemedTextLabel)
-local ListItemChrome = require(Modules.Plugin.Components.ListItemChrome)
+local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
+local ThemedTextLabel = require(script.Parent.Parent.ThemedTextLabel)
+local ListItemChrome = require(script.Parent.Parent.ListItemChrome)
 
 local InstanceItem = Roact.Component:extend("InstanceItem")
 
 function InstanceItem:render()
 	local props = self.props
-
 	local state = "Default"
 
 	if props.Selected then
@@ -24,39 +21,35 @@ function InstanceItem:render()
 		LayoutOrder = props.LayoutOrder,
 		state = state,
 
-		mouseEnter = function(rbx)
+		mouseEnter = function()
 			self:setState({
 				hover = true,
 			})
 		end,
 
-		mouseLeave = function(rbx)
+		mouseLeave = function()
 			self:setState({
 				hover = false,
 			})
 		end,
 
-		leftClick = function(rbx)
+		leftClick = function()
 			local sel = Selection:Get()
-			local alreadySelected = false
-			for _,instance in pairs(sel) do
-				if instance == props.Instance then
-					alreadySelected = true
-					break
-				end
-			end
+			local alreadySelected = table.find(sel, props.Instance) ~= nil
+
 			if alreadySelected then
 				if #sel > 1 then
 					-- select only this
-					Selection:Set({ props.Instance })
+					Selection:Set({props.Instance})
 				else
 					-- deselect
 					local baseSel = {}
-					for _,instance in pairs(sel) do
+					for _, instance in pairs(sel) do
 						if instance ~= props.Instance then
-							baseSel[#baseSel+1] = instance
+							table.insert(baseSel, instance)
 						end
 					end
+
 					Selection:Set(baseSel)
 				end
 			else
@@ -65,27 +58,31 @@ function InstanceItem:render()
 				local function isDown(key)
 					return UserInputService:IsKeyDown(Enum.KeyCode[key])
 				end
-				if isDown('LeftControl') or isDown('RightControl') or isDown('LeftShift') or isDown('RightShift') then
+
+				if isDown("LeftControl") or isDown("RightControl") or isDown("LeftShift") or isDown("RightShift") then
 					baseSel = sel
 				end
-				baseSel[#baseSel+1] = props.Instance
+
+				table.insert(baseSel, props.Instance)
 				Selection:Set(baseSel)
 			end
 		end,
 	}, {
 		Container = Roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundTransparency = 1.0,
+			BackgroundTransparency = 1,
 		}, {
 			UIPadding = Roact.createElement("UIPadding", {
 				PaddingLeft = UDim.new(0, 12),
 			}),
+
 			UIListLayout = Roact.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = UDim.new(0, 4),
 			}),
+
 			InstanceClass = Roact.createElement(ThemedTextLabel, {
 				object = "DimmedText",
 				state = state,
@@ -93,18 +90,20 @@ function InstanceItem:render()
 				Text = props.ClassName,
 				LayoutOrder = 1,
 			}),
+
 			InstanceName = Roact.createElement(ThemedTextLabel, {
 				state = state,
 				Text = props.Name,
 				LayoutOrder = 2,
 			}),
+
 			Path = Roact.createElement(ThemedTextLabel, {
 				Font = Enum.Font.SourceSansItalic,
 				state = state,
 				Text = props.Path,
 				LayoutOrder = 3,
 				TextSize = 16,
-			})
+			}),
 		}),
 	})
 end

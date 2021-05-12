@@ -1,7 +1,5 @@
-local Modules = script.Parent.Parent.Parent
-local RoactRodux = require(Modules.RoactRodux)
-local Actions = require(Modules.Plugin.Actions)
-
+local Actions = require(script.Parent.Parent.Actions)
+local RoactRodux = require(script.Parent.Parent.Vendor.RoactRodux)
 local Search = require(script.Parent.Search)
 
 local function mapStateToProps(state)
@@ -14,7 +12,7 @@ local function mapDispatchToProps(dispatch)
 	return {
 		setTerm = function(text)
 			dispatch(Actions.SetSearch(text))
-		end
+		end,
 	}
 end
 

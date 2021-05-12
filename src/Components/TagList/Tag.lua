@@ -1,10 +1,9 @@
-local Modules = script.Parent.Parent.Parent.Parent
-local Roact = require(Modules.Roact)
-local RoactRodux = require(Modules.RoactRodux)
-local Actions = require(Modules.Plugin.Actions)
-local TagManager = require(Modules.Plugin.TagManager)
-local Item = require(Modules.Plugin.Components.ListItem)
-local TagSettings = require(Modules.Plugin.Components.TagList.TagSettings)
+local Actions = require(script.Parent.Parent.Parent.Actions)
+local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
+local RoactRodux = require(script.Parent.Parent.Parent.Vendor.RoactRodux)
+local TagManager = require(script.Parent.Parent.Parent.TagManager)
+local Item = require(script.Parent.Parent.ListItem)
+local TagSettings = require(script.Parent.TagSettings)
 
 local function Tag(props)
 	local isOpen = props.tagWithOpenMenu == props.Tag
@@ -33,11 +32,11 @@ local function Tag(props)
 			end
 		end,
 
-		leftClick = function(rbx)
+		leftClick = function()
 			TagManager.Get():SetTag(props.Tag, not props.HasAll)
 		end,
 
-		rightClick = function(rbx)
+		rightClick = function()
 			if not isOpen then
 				props.openTagMenu(props.Tag)
 			else
@@ -45,8 +44,7 @@ local function Tag(props)
 			end
 		end,
 	}, {
-		Settings = isOpen and Roact.createElement(TagSettings, {
-		})
+		Settings = isOpen and Roact.createElement(TagSettings, {}),
 	})
 end
 
@@ -60,7 +58,7 @@ local function mapDispatchToProps(dispatch)
 	return {
 		openTagMenu = function(tag)
 			dispatch(Actions.OpenTagMenu(tag))
-		end
+		end,
 	}
 end
 
