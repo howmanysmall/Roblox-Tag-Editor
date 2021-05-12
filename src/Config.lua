@@ -1,6 +1,6 @@
 local Config = {
 	useDevSource = false,
-	betaRelease = true,
+	betaRelease = false,
 }
 
 return Config
