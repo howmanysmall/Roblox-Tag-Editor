@@ -5,7 +5,15 @@ Check out the [Roblox Developer Forum post](https://devforum.roblox.com/t/tag-ed
 
 ## Changelog
 
-### **v2.1.0**
+### **v2.2.0**
+
+- Replaced legacy theme system with Roact's context API.
+- Fixed the world view tag with long Instance ClassNames/Names. (eg: a SpawnLocation named SpawnLocation would make the text longer than the box)
+- Janitor
+- Removed submodules for rotriever (kayak) based management.
+- Other Luau performance changes.
+
+### v2.1.0
 
 - Updated UI design. (Thanks @AmaranthineCodices!)
 - Studio themes support. (@AmaranthineCodices)
