@@ -1,7 +1,6 @@
 {
   "name": "Roblox-Tag-Editor",
   "globIgnorePaths": ["**/*.spec.lua", "**/*.spec"],
-  "servePort": 12345,
   "tree": {
     "$className": "DataModel",
     "HttpService": {
