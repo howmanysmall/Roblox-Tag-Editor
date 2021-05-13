@@ -5,10 +5,12 @@ local TagManager = require(script.Parent.Parent.Parent.TagManager)
 local Item = require(script.Parent.Parent.ListItem)
 local TagSettings = require(script.Parent.TagSettings)
 
+local Roact_createElement = Roact.createElement
+
 local function Tag(props)
 	local isOpen = props.tagWithOpenMenu == props.Tag
 
-	return Roact.createElement(Item, {
+	return Roact_createElement(Item, {
 		Text = props.Tag,
 		Icon = props.Icon,
 		IsInput = false,
@@ -44,7 +46,7 @@ local function Tag(props)
 			end
 		end,
 	}, {
-		Settings = isOpen and Roact.createElement(TagSettings, {}),
+		Settings = isOpen and Roact_createElement(TagSettings, {}),
 	})
 end
 

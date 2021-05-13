@@ -11,6 +11,8 @@ local ThemeContext = require(script.Parent.ThemeContext)
 
 local IconPicker = Roact.PureComponent:extend("IconPicker")
 
+local Roact_createElement = Roact.createElement
+
 function IconPicker:init()
 	self.closeFunc = function()
 		self.props.close()
@@ -22,7 +24,8 @@ function IconPicker:init()
 end
 
 function IconPicker:shouldUpdate(newProps)
-	return self.props.tagName ~= newProps.tagName or self.props.search ~= newProps.search
+	local props = self.props
+	return props.tagName ~= newProps.tagName or props.search ~= newProps.search
 end
 
 function IconPicker:render()
@@ -51,11 +54,11 @@ function IconPicker:render()
 		return a.Name < b.Name
 	end)
 
-	for i, cat in ipairs(cats) do
+	for index, cat in ipairs(cats) do
 		local name = cat.Name
 		local icons = cat.Icons
-		children[name] = Roact.createElement(Category, {
-			LayoutOrder = i,
+		children[name] = Roact_createElement(Category, {
+			LayoutOrder = index,
 			CategoryName = name,
 			Icons = icons,
 			tagName = props.tagName,
@@ -65,52 +68,52 @@ function IconPicker:render()
 		})
 	end
 
-	children.UIPadding = Roact.createElement("UIPadding", {
+	children.UIPadding = Roact_createElement("UIPadding", {
 		PaddingLeft = UDim.new(0, 4),
 		PaddingRight = UDim.new(0, 4),
 		PaddingTop = UDim.new(0, 4),
 		PaddingBottom = UDim.new(0, 4),
 	})
 
-	return Roact.createElement(Page, {
+	return Roact_createElement(Page, {
 		visible = props.tagName ~= nil,
 		title = tostring(props.tagName) .. " - Select an Icon",
 		titleIcon = props.tagIcon,
 
 		close = props.close,
 	}, {
-		IconList = Roact.createElement(ScrollingFrame, {
+		IconList = Roact_createElement(ScrollingFrame, {
 			Size = UDim2.new(1, 0, 1, -64),
-			Position = UDim2.new(0, 0, 0, 64),
+			Position = UDim2.fromOffset(0, 64),
 			List = true,
 		}, children),
 
-		TopBar = Roact.createElement(ThemeContext.Consumer, {
+		TopBar = Roact_createElement(ThemeContext.Consumer, {
 			render = function(theme)
-				return Roact.createElement("Frame", {
+				return Roact_createElement("Frame", {
 					BackgroundColor3 = theme.Titlebar.Default,
 					BorderSizePixel = 0,
 					Size = UDim2.new(1, 0, 0, 64),
 					ZIndex = 2,
 				}, {
-					Search = Roact.createElement(Search, {
+					Search = Roact_createElement(Search, {
 						Size = UDim2.new(1, -56, 0, 40),
-						Position = UDim2.new(0, 56, 0, 0),
+						Position = UDim2.fromOffset(56, 0),
 
 						term = props.search,
 						setTerm = props.setTerm,
 					}),
 
-					Preview = Roact.createElement(IconPreview, {
-						Position = UDim2.new(0, 8, 0, 8),
+					Preview = Roact_createElement(IconPreview, {
+						Position = UDim2.fromOffset(8, 8),
 					}),
 
-					Separator = Roact.createElement("Frame", {
+					Separator = Roact_createElement("Frame", {
 						-- This separator acts as a bottom border, so we should use the border color, not the separator color
 						BackgroundColor3 = theme.Border.Default,
 						BorderSizePixel = 0,
 						Size = UDim2.new(1, 0, 0, 1),
-						Position = UDim2.new(0, 0, 1, 0),
+						Position = UDim2.fromScale(0, 1),
 						AnchorPoint = Vector2.new(0, 1),
 						ZIndex = 2,
 					}),

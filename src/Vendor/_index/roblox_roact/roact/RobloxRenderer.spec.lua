@@ -191,10 +191,10 @@ return function()
 			local defaultStringValue = Instance.new("StringValue").Value
 
 			local element = createElement("StringValue", {
-				Value = firstValue
+				Value = firstValue,
 			}, {
 				ChildA = createElement("IntValue", {
-					Value = 1
+					Value = 1,
 				}),
 				ChildB = createElement("BoolValue", {
 					Value = true,
@@ -204,7 +204,7 @@ return function()
 				}),
 				ChildD = createElement("StringValue", {
 					Value = "test",
-				})
+				}),
 			})
 
 			local node = reconciler.createVirtualNode(element, parent, key)
@@ -218,7 +218,7 @@ return function()
 			}, {
 				-- ChildA changes element type.
 				ChildA = createElement("StringValue", {
-					Value = "test"
+					Value = "test",
 				}),
 				-- ChildB changes child properties.
 				ChildB = createElement("BoolValue", {
@@ -369,7 +369,7 @@ return function()
 			local spyRef = createSpy()
 
 			local element = createElement("Frame", {
-				Size = UDim2.new(1, 0, 1, 0),
+				Size = UDim2.fromScale(1, 1),
 				[Ref] = spyRef.value,
 			})
 
@@ -385,7 +385,7 @@ return function()
 			spyRef:assertCalledWith(instance)
 
 			local newElement = createElement("Frame", {
-				Size = UDim2.new(0.5, 0, 0.5, 0),
+				Size = UDim2.fromScale(0.5, 0.5),
 				[Ref] = spyRef.value,
 			})
 
@@ -426,7 +426,7 @@ return function()
 			local key = "Some Key"
 
 			local element = createElement("Frame", {
-				Size = UDim2.new(1, 0, 1, 0),
+				Size = UDim2.fromScale(1, 1),
 			}, {
 				child = createElement("Frame"),
 			})
@@ -441,7 +441,7 @@ return function()
 			expect(#instance:GetChildren()).to.equal(1)
 
 			local newElement = createElement("Frame", {
-				Size = UDim2.new(0.5, 0, 0.5, 0),
+				Size = UDim2.fromScale(0.5, 0.5),
 			})
 
 			RobloxRenderer.updateHostNode(reconciler, node, newElement)
@@ -773,8 +773,8 @@ return function()
 					}),
 					TheOtherValue = createElement("IntValue", {
 						Value = 2,
-					})
-				})
+					}),
+				}),
 			})
 
 			local node = reconciler.mountVirtualNode(fragment, hostParent, "Test")
@@ -812,7 +812,7 @@ return function()
 			local capturedContext
 			function Consumer:init()
 				capturedContext = {
-					hello = self:__getContext("hello")
+					hello = self:__getContext("hello"),
 				}
 			end
 
@@ -820,7 +820,7 @@ return function()
 			end
 
 			local element = createElement("Folder", nil, {
-				Consumer = createElement(Consumer)
+				Consumer = createElement(Consumer),
 			})
 			local hostParent = nil
 			local hostKey = "Context Test"
@@ -866,14 +866,14 @@ return function()
 					target = target,
 				}, {
 					Consumer = createElement(Consumer),
-				})
+				}),
 			})
 			local hostParent = nil
 			local hostKey = "Some Key"
 			reconciler.mountVirtualNode(element, hostParent, hostKey)
 
 			assertDeepEqual(capturedContext, {
-				foo = "bar"
+				foo = "bar",
 			})
 		end)
 	end)
@@ -891,7 +891,7 @@ return function()
 			end
 
 			local element = createElement("Folder", nil, {
-				Consumer = createElement(Consumer)
+				Consumer = createElement(Consumer),
 			})
 			local hostParent = nil
 			local hostKey = "Context Test"
@@ -935,14 +935,14 @@ return function()
 					target = target,
 				}, {
 					Consumer = createElement(Consumer),
-				})
+				}),
 			})
 			local hostParent = nil
 			local hostKey = "Some Key"
 			reconciler.mountVirtualNode(element, hostParent, hostKey)
 
 			assertDeepEqual(capturedContext, {
-				foo = "bar"
+				foo = "bar",
 			})
 		end)
 	end)

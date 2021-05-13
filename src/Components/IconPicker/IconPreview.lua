@@ -6,17 +6,19 @@ local ThemedTextLabel = require(script.Parent.Parent.ThemedTextLabel)
 
 local IconPreview = Roact.PureComponent:extend("IconPreview")
 
+local Roact_createElement = Roact.createElement
+
 function IconPreview:render()
+	local props = self.props
 	local scaleFactor = 3
 
 	local function update()
-		local Vector2new = Vector2.new
-		local image = self.props.icon and Icons.Lookup(self.props.icon)
+		local image = props.icon and Icons.Lookup(props.icon)
 		local rect = image and image.ImageRectOffset or Vector2.new(10000, 10000)
-		for y = 0, 16 - 1 do
-			for x = 0, 16 - 1 do
+		for y = 0, 15 do
+			for x = 0, 15 do
 				local pixel = self.pixels[x * 16 + y]
-				pixel.ImageRectOffset = rect + Vector2new(x + 0.5, y + 0.5)
+				pixel.ImageRectOffset = rect + Vector2.new(x + 0.5, y + 0.5)
 			end
 		end
 	end
@@ -25,23 +27,23 @@ function IconPreview:render()
 		update()
 	end
 
-	return Roact.createElement("Frame", {
+	return Roact_createElement("Frame", {
 		Size = UDim2.new(1, 0, 0, 56),
-		Position = self.props.Position,
+		Position = props.Position,
 		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(),
 	}, {
-		IconName = Roact.createElement(ThemedTextLabel, {
+		IconName = Roact_createElement(ThemedTextLabel, {
 			TextSize = 14,
 			Size = UDim2.new(1, -56, 0, 20 * 3),
-			Position = UDim2.new(0, 56, 0, 32),
+			Position = UDim2.fromOffset(56, 32),
 			TextWrapped = true,
-			Text = self.props.icon or "",
+			Text = props.icon or "",
 			TextYAlignment = Enum.TextYAlignment.Top,
 		}),
 
-		IconMagnify = Roact.createElement("Frame", {
-			Size = UDim2.new(0, 48, 0, 48),
+		IconMagnify = Roact_createElement("Frame", {
+			Size = UDim2.fromOffset(48, 48),
 			BorderColor3 = Constants.DarkGrey,
 			BackgroundColor3 = Constants.White,
 			BackgroundTransparency = 1,
@@ -67,8 +69,8 @@ function IconPreview:render()
 							image.Name = string.format("Pixel [%d, %d]", x, y)
 							image.Image = Icons.Asset
 							image.ImageRectSize = Vector2.new()
-							image.Size = UDim2.new(0, scaleFactor, 0, scaleFactor)
-							image.Position = UDim2.new(0, x * scaleFactor, 0, y * scaleFactor)
+							image.Size = UDim2.fromOffset(scaleFactor, scaleFactor)
+							image.Position = UDim2.fromOffset(x * scaleFactor, y * scaleFactor)
 							image.BackgroundTransparency = 1
 							image.Parent = rbx
 							self.pixels[x * 16 + y] = image
@@ -95,6 +97,7 @@ local function mapStateToProps(state)
 			end
 		end
 	end
+
 	return {
 		icon = icon,
 	}

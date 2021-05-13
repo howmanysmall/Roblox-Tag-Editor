@@ -14,29 +14,33 @@ end
 
 local Category = Roact.PureComponent:extend("Category")
 
+local Roact_createElement = Roact.createElement
+local Scheduler_Spawn = Scheduler.Spawn
+
 function Category:render()
 	local cellSize = 24
 	local props = self.props
+
 	local children = {
-		UIGridLayout = Roact.createElement("UIGridLayout", {
-			CellSize = UDim2.new(0, cellSize, 0, cellSize),
+		UIGridLayout = Roact_createElement("UIGridLayout", {
+			CellSize = UDim2.fromOffset(cellSize, cellSize),
 			CellPadding = UDim2.new(),
 			SortOrder = Enum.SortOrder.LayoutOrder,
 		}),
 	}
 
 	local numMatched = 0
-	for i, icon in pairs(props.Icons) do
+	for index, icon in ipairs(props.Icons) do
 		local matches = matchesSearch(props.search, icon)
 		if matches then
-			numMatched = numMatched + 1
+			numMatched += 1
 		end
 
-		children[icon] = Roact.createElement("TextButton", {
+		children[icon] = Roact_createElement("TextButton", {
 			BackgroundTransparency = 1,
+			LayoutOrder = index,
 			Text = "",
 			Visible = matches,
-			LayoutOrder = i,
 			[Roact.Event.MouseButton1Click] = function()
 				TagManager.Get():SetIcon(props.tagName, icon)
 				props.close()
@@ -54,34 +58,34 @@ function Category:render()
 				end
 			end,
 		}, {
-			Icon = Roact.createElement(Icon, {
-				Name = icon,
-				Size = UDim2.new(0, 16, 0, 16),
+			Icon = Roact_createElement(Icon, {
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.new(0.5, 0, 0.5, 0),
+				Name = icon,
+				Position = UDim2.fromScale(0.5, 0.5),
+				Size = UDim2.fromOffset(16, 16),
 			}),
 		})
 	end
 
-	return Roact.createElement("Frame", {
-		Size = UDim2.new(1, 0, 0, 0),
+	return Roact_createElement("Frame", {
+		Size = UDim2.fromScale(1, 0),
 		LayoutOrder = props.LayoutOrder,
 		BackgroundTransparency = 1,
 		Visible = numMatched > 0,
 	}, {
-		Label = Roact.createElement(ThemedTextLabel, {
+		Label = Roact_createElement(ThemedTextLabel, {
 			Text = props.CategoryName,
 			Size = UDim2.new(1, 0, 0, 20),
 			Font = Enum.Font.SourceSansSemibold,
 		}),
 
-		Body = Roact.createElement("Frame", {
-			Size = UDim2.new(1, 0, 0, 0),
-			Position = UDim2.new(0, 0, 0, 20),
+		Body = Roact_createElement("Frame", {
+			Size = UDim2.fromScale(1, 0),
+			Position = UDim2.fromOffset(0, 20),
 			BackgroundTransparency = 1,
 
 			[Roact.Change.AbsoluteSize] = function(rbx)
-				Scheduler.Spawn(function()
+				Scheduler_Spawn(function()
 					local stride = cellSize
 					local epsilon = 0.001
 					local w = math.floor(rbx.AbsoluteSize.X / stride + epsilon)

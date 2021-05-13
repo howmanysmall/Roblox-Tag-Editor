@@ -1,5 +1,6 @@
 local Roact = require(script.Parent.Parent.Vendor.Roact)
 local ThemeContext = require(script.Parent.ThemeContext)
+local Roact_createElement = Roact.createElement
 
 local function ListItemChrome(props)
 	local height = props.height or 26
@@ -9,9 +10,9 @@ local function ListItemChrome(props)
 
 	state = type(state) == "string" and state or state.Name
 
-	return Roact.createElement(ThemeContext.Consumer, {
+	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
-			return Roact.createElement("TextButton", {
+			return Roact_createElement("TextButton", {
 				Size = UDim2.new(1, 0, 0, height),
 				AutoButtonColor = false,
 				LayoutOrder = props.LayoutOrder,
@@ -25,7 +26,7 @@ local function ListItemChrome(props)
 				[Roact.Event.MouseButton1Click] = props.leftClick,
 				[Roact.Event.MouseButton2Click] = props.rightClick,
 			}, {
-				Divider = Roact.createElement("Frame", {
+				Divider = Roact_createElement("Frame", {
 					Visible = showDivider,
 					Size = UDim2.new(1, 0, 0, 1),
 					Position = UDim2.new(0.5, 0, 0, -1),

@@ -1,19 +1,21 @@
 local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
+local Roact_createElement = Roact.createElement
 
 local function SphereAdorn(props)
+	local adornee = props.Adornee
 	local adorn, cframe
-	if props.Adornee:IsA("Attachment") then
-		adorn = props.Adornee.Parent
-		cframe = props.Adornee.CFrame
+	if adornee:IsA("Attachment") then
+		adorn = adornee.Parent
+		cframe = adornee.CFrame
 	else
-		adorn = props.Adornee
+		adorn = adornee
 	end
 
-	return Roact.createElement("SphereHandleAdornment", {
+	return Roact_createElement("SphereHandleAdornment", {
 		Adornee = adorn,
+		AlwaysOnTop = props.AlwaysOnTop,
 		CFrame = cframe,
 		Color3 = props.Color,
-		AlwaysOnTop = props.AlwaysOnTop,
 		Transparency = 0.3,
 		ZIndex = props.AlwaysOnTop and 1 or nil,
 	})

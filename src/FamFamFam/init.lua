@@ -12,7 +12,7 @@ function FamFamFam.Create(name)
 	assert(data, "no such icon named `" .. name .. "`")
 	local img = Instance.new("ImageLabel")
 	img.BackgroundTransparency = 1
-	img.Size = UDim2.new(0, 16, 0, 16)
+	img.Size = UDim2.fromOffset(16, 16)
 	img.Image = FamFamFam.Asset
 	img.ImageRectOffset = Vector2.new(data[1], data[2])
 	img.ImageRectSize = Vector2.new(16, 16)

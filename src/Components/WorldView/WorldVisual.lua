@@ -7,6 +7,8 @@ local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 local SphereAdorn = require(script.Parent.SphereAdorn)
 local TextAdorn = require(script.Parent.TextAdorn)
 
+local Roact_createElement = Roact.createElement
+
 local function WorldVisual(props)
 	local partsList = props.partsList
 
@@ -28,7 +30,7 @@ local function WorldVisual(props)
 			error("Unknown DrawType: " .. tostring(entry.DrawType))
 		end
 
-		children[key] = Roact.createElement(elt, {
+		children[key] = Roact_createElement(elt, {
 			Adornee = entry.Part,
 			Icon = entry.Icon,
 			Color = entry.Color,
@@ -37,10 +39,10 @@ local function WorldVisual(props)
 		})
 	end
 
-	return Roact.createElement(Roact.Portal, {
+	return Roact_createElement(Roact.Portal, {
 		target = CoreGui,
 	}, {
-		TagEditorWorldView = Roact.createElement("Folder", {}, children),
+		TagEditorWorldView = Roact_createElement("Folder", {}, children),
 	})
 end
 

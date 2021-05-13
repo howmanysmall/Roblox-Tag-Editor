@@ -2,6 +2,11 @@ local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
 local TextBox = Roact.PureComponent:extend("ColorPicker.TextBox")
+TextBox.defaultProps = {
+	Inset = 36,
+}
+
+local Roact_createElement = Roact.createElement
 
 function TextBox:init()
 	self:setState({
@@ -13,32 +18,33 @@ end
 
 function TextBox:render()
 	local props = self.props
-	local inset = props.Inset or 36
+	local inset = props.Inset
 
-	return Roact.createElement(ThemeContext.Consumer, {
+	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
+			local state = self.state
 			local borderColor
-			if not self.state.isValid then
+			if not state.isValid then
 				borderColor = Color3.fromRGB(255, 0, 0)
 			else
-				if self.state.focus then
+				if state.focus then
 					borderColor = theme.InputFieldBorder.Selected
-				elseif self.state.hover then
+				elseif state.hover then
 					borderColor = theme.InputFieldBorder.Hover
 				else
 					borderColor = theme.InputFieldBorder.Default
 				end
 			end
 
-			return Roact.createElement("Frame", {
+			return Roact_createElement("Frame", {
 				Size = props.Size,
 				Position = props.Position,
 				BackgroundTransparency = 1,
 				LayoutOrder = props.LayoutOrder,
 			}, {
-				Label = props.Label and Roact.createElement("TextLabel", {
+				Label = props.Label and Roact_createElement("TextLabel", {
 					Text = props.Label,
-					Size = UDim2.new(0, inset, 0, 20),
+					Size = UDim2.fromOffset(inset, 20),
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextSize = 20,
 					Font = Enum.Font.SourceSans,
@@ -46,9 +52,9 @@ function TextBox:render()
 					BackgroundTransparency = 1,
 				}) or nil,
 
-				Input = Roact.createElement("Frame", {
+				Input = Roact_createElement("Frame", {
 					Size = UDim2.new(1, -inset, 1, 0),
-					Position = UDim2.new(0, inset, 0, 0),
+					Position = UDim2.fromOffset(inset, 0),
 					BackgroundColor3 = theme.InputFieldBackground.Default,
 					BorderColor3 = borderColor,
 
@@ -64,7 +70,7 @@ function TextBox:render()
 						})
 					end,
 				}, {
-					TextBox = Roact.createElement("TextBox", {
+					TextBox = Roact_createElement("TextBox", {
 						Text = "",
 						PlaceholderText = props.Text,
 						PlaceholderColor3 = theme.DimmedText.Default,
@@ -73,7 +79,7 @@ function TextBox:render()
 						TextColor3 = theme.MainText.Default,
 						Size = UDim2.new(1, -16, 1, 0),
 						AnchorPoint = Vector2.new(0.5, 0.5),
-						Position = UDim2.new(0.5, 0, 0.5, 0),
+						Position = UDim2.fromScale(0.5, 0.5),
 						BackgroundTransparency = 1,
 						TextXAlignment = Enum.TextXAlignment.Left,
 

@@ -1,6 +1,7 @@
 local Roact = require(script.Parent.Parent.Vendor.Roact)
 local ThemeContext = require(script.Parent.ThemeContext)
 local getTheme = require(script.Parent.Parent.Utility.getTheme)
+local Roact_createElement = Roact.createElement
 
 local ThemeController = Roact.PureComponent:extend("ThemeController")
 
@@ -25,7 +26,7 @@ function ThemeController:willUnmount()
 end
 
 function ThemeController:render()
-	return Roact.createElement(ThemeContext.Provider, {
+	return Roact_createElement(ThemeContext.Provider, {
 		value = self.state.theme,
 	}, self.props[Roact.Children])
 end

@@ -4,8 +4,10 @@ local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 local RoactRodux = require(script.Parent.Parent.Parent.Vendor.RoactRodux)
 local TagManager = require(script.Parent.Parent.Parent.TagManager)
 
+local Roact_createElement = Roact.createElement
+
 local function GroupItem(props)
-	return Roact.createElement(Item, {
+	return Roact_createElement(Item, {
 		Icon = "folder",
 		Text = props.Name,
 		Active = props.Active,

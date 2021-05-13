@@ -4,13 +4,20 @@ local Roact = require(script.Parent.Parent.Vendor.Roact)
 local RoactRodux = require(script.Parent.Parent.Vendor.RoactRodux)
 local TaggedInstanceProvider = require(script.TaggedInstanceProvider)
 local TagManager = require(script.Parent.Parent.TagManager)
+local Logger = require(script.Parent.Parent.Utility.Logger)
+
+local ENABLED = true
+local Roact_createElement = Roact.createElement
+local InstanceViewLogger = Logger.new("InstanceViewLogger"):SetEnabled(ENABLED)
 
 local function InstanceView(props)
-	return Roact.createElement(TaggedInstanceProvider, {
+	InstanceViewLogger:Debug("InstanceView.props: {:?}", props)
+	return Roact_createElement(TaggedInstanceProvider, {
 		tagName = props.tagName,
 	}, {
 		render = function(parts, selected)
-			return Roact.createElement(InstanceList, {
+			InstanceViewLogger:Debug("parts: {:?}\nselected: {:?}", parts, selected)
+			return Roact_createElement(InstanceList, {
 				parts = parts,
 				selected = selected,
 				tagName = props.tagName,

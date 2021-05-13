@@ -1,13 +1,15 @@
 local Roact = require(script.Parent.Parent.Vendor.Roact)
 local RoactRodux = require(script.Parent.Parent.Vendor.RoactRodux)
-local WorldVisual = require(script.WorldVisual)
 local WorldProvider = require(script.WorldProvider)
+local WorldVisual = require(script.WorldVisual)
+
+local Roact_createElement = Roact.createElement
 
 local function WorldView(props)
 	if props.enabled then
-		return Roact.createElement(WorldProvider, {}, {
+		return Roact_createElement(WorldProvider, {}, {
 			render = function(partsList)
-				return Roact.createElement(WorldVisual, {
+				return Roact_createElement(WorldVisual, {
 					partsList = partsList,
 					tags = props.tags,
 				})

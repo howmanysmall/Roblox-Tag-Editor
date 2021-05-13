@@ -1,40 +1,42 @@
 local Icons = require(script.Parent.Parent.FamFamFam)
 local Roact = require(script.Parent.Parent.Vendor.Roact)
+local Roact_createElement = Roact.createElement
 
 local function Icon(props)
-	local data = typeof(props.Name) == "string" and Icons.Lookup(props.Name) or Icons.Lookup("computer_error")
+	local data = type(props.Name) == "string" and Icons.Lookup(props.Name) or Icons.Lookup("computer_error")
 	local newProps = {
-		Size = props.Size or UDim2.new(0, 16, 0, 16),
+		AnchorPoint = props.AnchorPoint,
 		BackgroundTransparency = props.BackgroundTransparency or 1,
 		Position = props.Position,
-		AnchorPoint = props.AnchorPoint,
+		Size = props.Size or UDim2.fromOffset(16, 16),
 
 		[Roact.Event.MouseButton1Click] = props.onClick,
-
 		[Roact.Event.MouseEnter] = function()
-			if props.onHover then
-				props.onHover(true)
+			local onHover = props.onHover
+			if onHover then
+				onHover(true)
 			end
 		end,
 
 		[Roact.Event.MouseLeave] = function()
-			if props.onHover then
-				props.onHover(false)
+			local onHover = props.onHover
+			if onHover then
+				onHover(false)
 			end
 		end,
 	}
 
-	for k, v in pairs(data) do
-		newProps[k] = v
+	for key, value in pairs(data) do
+		newProps[key] = value
 	end
 
-	for k, v in pairs(props) do
-		if k ~= "Name" and k ~= "onClick" and k ~= "onHover" then
-			newProps[k] = v
+	for key, value in pairs(props) do
+		if key ~= "Name" and key ~= "onClick" and key ~= "onHover" then
+			newProps[key] = value
 		end
 	end
 
-	return Roact.createElement(props.onClick and "ImageButton" or "ImageLabel", newProps)
+	return Roact_createElement(props.onClick and "ImageButton" or "ImageLabel", newProps)
 end
 
 return Icon

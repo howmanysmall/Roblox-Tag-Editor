@@ -4,6 +4,8 @@ local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
 local ValueSlider = Roact.PureComponent:extend("ValueSlider")
 
+local Roact_createElement = Roact.createElement
+
 function ValueSlider:init()
 	self:setState({
 		mouseDown = false,
@@ -18,14 +20,17 @@ function ValueSlider:xToAlpha(x)
 end
 
 function ValueSlider:render()
-	return Roact.createElement(ThemeContext.Consumer, {
+	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
-			return Roact.createElement("ImageButton", {
+			local props = self.props
+			local state = self.state
+
+			return Roact_createElement("ImageButton", {
 				Size = UDim2.new(1, 0, 0, 20),
 				Position = UDim2.new(0, 0, 1, 5),
 				AnchorPoint = Vector2.new(),
 				Image = "rbxassetid://1357203924",
-				ImageColor3 = Color3.fromHSV(self.props.hue, self.props.sat, 1),
+				ImageColor3 = Color3.fromHSV(props.hue, props.sat, 1),
 				AutoButtonColor = false,
 				BorderColor3 = theme.Border.Default,
 				[Roact.Ref] = self._rootRef,
@@ -35,38 +40,38 @@ function ValueSlider:render()
 						valueMouseDown = true,
 					})
 
-					self.props.updatePosition(self:xToAlpha(x))
+					props.updatePosition(self:xToAlpha(x))
 				end,
 			}, {
-				Position = Roact.createElement("ImageLabel", {
-					Size = UDim2.new(0, 8, 0, 5),
+				Position = Roact_createElement("ImageLabel", {
+					Size = UDim2.fromOffset(8, 5),
 					BackgroundTransparency = 1,
-					Position = UDim2.new(self.props.val, 0, 0, 0),
+					Position = UDim2.fromScale(props.val, 0),
 					AnchorPoint = Vector2.new(0.5, 0),
 					Image = "rbxassetid://2610863246",
 					-- Hardcode this color, since the color it's on top of doesn't respond to themes
 					ImageColor3 = Color3.fromRGB(255, 255, 255),
 				}),
 
-				Portal = Roact.createElement(RootPortal, nil, {
-					ValueSliderInputCapturer = Roact.createElement("ImageButton", {
+				Portal = Roact_createElement(RootPortal, nil, {
+					ValueSliderInputCapturer = Roact_createElement("ImageButton", {
 						BackgroundTransparency = 1,
 						ZIndex = 100,
-						Size = self.state.valueMouseDown and UDim2.new(1, 0, 1, 0) or UDim2.new(),
-						Visible = self.state.valueMouseDown,
+						Size = state.valueMouseDown and UDim2.fromScale(1, 1) or UDim2.new(),
+						Visible = state.valueMouseDown,
 						[Roact.Event.MouseButton1Up] = function(_, x)
-							if self.state.valueMouseDown then
+							if state.valueMouseDown then
 								self:setState({
 									valueMouseDown = false,
 								})
 
-								self.props.updatePosition(self:xToAlpha(x))
+								props.updatePosition(self:xToAlpha(x))
 							end
 						end,
 
 						[Roact.Event.MouseMoved] = function(_, x)
-							if self.state.valueMouseDown then
-								self.props.updatePosition(self:xToAlpha(x))
+							if state.valueMouseDown then
+								props.updatePosition(self:xToAlpha(x))
 							end
 						end,
 					}),

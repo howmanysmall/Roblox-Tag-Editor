@@ -4,6 +4,8 @@ local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
 
 local TaggedInstanceProvider = Roact.PureComponent:extend("TaggedInstanceProvider")
 
+local Roact_oneChild = Roact.oneChild
+
 function TaggedInstanceProvider:init()
 	self.nextId = 1
 	self.partIds = {}
@@ -29,10 +31,13 @@ function TaggedInstanceProvider:updateState(tagName)
 
 	local parts = {}
 	if tagName then
+		print("tagName exists:", tagName)
 		parts = CollectionService:GetTagged(tagName)
+	else
+		print("no tagName")
 	end
 
-	for i, part in ipairs(parts) do
+	for index, part in ipairs(parts) do
 		local path = {}
 		local cur = part.Parent
 		while cur and cur ~= game do
@@ -47,7 +52,7 @@ function TaggedInstanceProvider:updateState(tagName)
 			self.partIds[part] = id
 		end
 
-		parts[i] = {
+		parts[index] = {
 			id = id,
 			instance = part,
 			path = table.concat(path, "."),
@@ -173,7 +178,7 @@ end
 
 function TaggedInstanceProvider:render()
 	local state = self.state
-	return Roact.oneChild(self.props[Roact.Children])(state.parts, state.selected)
+	return Roact_oneChild(self.props[Roact.Children])(state.parts, state.selected)
 end
 
 return TaggedInstanceProvider

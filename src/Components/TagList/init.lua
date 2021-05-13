@@ -9,22 +9,24 @@ local Tag = require(script.Tag)
 local TagManager = require(script.Parent.Parent.TagManager)
 
 local function merge(orig, new)
-	local t = {}
-	for k, v in pairs(orig or {}) do
-		t[k] = v
+	local newTable = {}
+	for key, value in pairs(orig or {}) do
+		newTable[key] = value
 	end
 
-	for k, v in pairs(new or {}) do
-		t[k] = v
+	for key, value in pairs(new or {}) do
+		newTable[key] = value
 	end
 
-	return t
+	return newTable
 end
 
 local TagList = Roact.PureComponent:extend("TagList")
 TagList.defaultProps = {
 	Size = UDim2.fromScale(1, 1),
 }
+
+local Roact_createElement = Roact.createElement
 
 function TagList:render()
 	local props = self.props
@@ -54,7 +56,7 @@ function TagList:render()
 	end)
 
 	local children = {
-		UIListLayout = Roact.createElement("UIListLayout", {
+		UIListLayout = Roact_createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 1),
 
@@ -68,8 +70,7 @@ function TagList:render()
 						return
 					end
 
-					local cs = rbx.AbsoluteContentSize
-					rbx.Parent.CanvasSize = UDim2.new(0, 0, 0, cs.Y)
+					rbx.Parent.CanvasSize = UDim2.fromOffset(0, rbx.AbsoluteContentSize.Y)
 				end
 
 				update()
@@ -80,11 +81,11 @@ function TagList:render()
 
 	local lastGroup
 	local itemCount = 1
-	for i = 1, #tags do
-		local groupName = tags[i].Group or "Default"
-		if tags[i].Group ~= lastGroup then
-			lastGroup = tags[i].Group
-			children["Group" .. groupName] = Roact.createElement(Group, {
+	for _, tag in ipairs(tags) do
+		local groupName = tag.Group or "Default"
+		if tag.Group ~= lastGroup then
+			lastGroup = tag.Group
+			children["Group" .. groupName] = Roact_createElement(Group, {
 				Name = groupName,
 				LayoutOrder = itemCount,
 				toggleHidden = toggleGroup,
@@ -94,9 +95,9 @@ function TagList:render()
 			itemCount = itemCount + 1
 		end
 
-		children[tags[i].Name] = Roact.createElement(Tag, merge(tags[i], {
+		children[tag.Name] = Roact_createElement(Tag, merge(tag, {
 			Hidden = self.state["Hide" .. groupName],
-			Tag = tags[i].Name,
+			Tag = tag.Name,
 			LayoutOrder = itemCount,
 		}))
 
@@ -104,7 +105,7 @@ function TagList:render()
 	end
 
 	for _, tag in ipairs(props.unknownTags) do
-		children[tag] = Roact.createElement(Item, {
+		children[tag] = Roact_createElement(Item, {
 			Text = string.format("%s (click to import)", tag),
 			Icon = "help",
 			ButtonColor = Constants.LightRed,
@@ -122,7 +123,7 @@ function TagList:render()
 	end
 
 	if #tags == 0 then
-		children.NoResults = Roact.createElement(Item, {
+		children.NoResults = Roact_createElement(Item, {
 			LayoutOrder = itemCount,
 			Text = "No search results found.",
 			Icon = "cancel",
@@ -136,7 +137,7 @@ function TagList:render()
 
 	local searchTagExists = table.find(tags, props.searchTerm) ~= nil
 	if props.searchTerm and #props.searchTerm > 0 and not searchTagExists then
-		children.AddNew = Roact.createElement(Item, {
+		children.AddNew = Roact_createElement(Item, {
 			LayoutOrder = itemCount,
 			Text = string.format("Add tag %q...", props.searchTerm),
 			Icon = "tag_blue_add",
@@ -147,7 +148,7 @@ function TagList:render()
 			end,
 		})
 	else
-		children.AddNew = Roact.createElement(Item, {
+		children.AddNew = Roact_createElement(Item, {
 			LayoutOrder = itemCount,
 			Text = "Add new tag...",
 			Icon = "tag_blue_add",
@@ -159,7 +160,7 @@ function TagList:render()
 		})
 	end
 
-	return Roact.createElement(ScrollingFrame, {
+	return Roact_createElement(ScrollingFrame, {
 		Size = props.Size,
 	}, children)
 end

@@ -1,20 +1,22 @@
 local Roact = require(script.Parent.Parent.Parent.Vendor.Roact)
+local Roact_createElement = Roact.createElement
 
 local function OutlineAdorn(props)
-	if props.Adornee:IsA("Attachment") then
-		return Roact.createElement("BoxHandleAdornment", {
-			Adornee = props.Adornee.Parent,
-			CFrame = props.Adornee.CFrame,
+	local adornee = props.Adornee
+	if adornee:IsA("Attachment") then
+		return Roact_createElement("BoxHandleAdornment", {
+			Adornee = adornee.Parent,
+			CFrame = adornee.CFrame,
+			Color3 = props.Color,
 			Size = Vector3.new(1.5, 1.5, 1.5),
 			Transparency = 0.3,
-			Color3 = props.Color,
 		})
 	end
 
-	return Roact.createElement("SelectionBox", {
-		LineThickness = 0.05,
-		Adornee = props.Adornee,
+	return Roact_createElement("SelectionBox", {
+		Adornee = adornee,
 		Color3 = props.Color,
+		LineThickness = 0.05,
 	})
 end
 

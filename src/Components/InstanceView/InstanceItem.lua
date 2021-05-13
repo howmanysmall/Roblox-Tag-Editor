@@ -7,6 +7,12 @@ local ListItemChrome = require(script.Parent.Parent.ListItemChrome)
 
 local InstanceItem = Roact.PureComponent:extend("InstanceItem")
 
+local Roact_createElement = Roact.createElement
+
+local function isDown(key)
+	return UserInputService:IsKeyDown(Enum.KeyCode[key])
+end
+
 function InstanceItem:render()
 	local props = self.props
 	local state = "Default"
@@ -17,7 +23,7 @@ function InstanceItem:render()
 		state = "Hover"
 	end
 
-	return Roact.createElement(ListItemChrome, {
+	return Roact_createElement(ListItemChrome, {
 		LayoutOrder = props.LayoutOrder,
 		state = state,
 
@@ -44,7 +50,7 @@ function InstanceItem:render()
 				else
 					-- deselect
 					local baseSel = {}
-					for _, instance in pairs(sel) do
+					for _, instance in ipairs(sel) do
 						if instance ~= props.Instance then
 							table.insert(baseSel, instance)
 						end
@@ -55,10 +61,6 @@ function InstanceItem:render()
 			else
 				-- select
 				local baseSel = {}
-				local function isDown(key)
-					return UserInputService:IsKeyDown(Enum.KeyCode[key])
-				end
-
 				if isDown("LeftControl") or isDown("RightControl") or isDown("LeftShift") or isDown("RightShift") then
 					baseSel = sel
 				end
@@ -68,22 +70,22 @@ function InstanceItem:render()
 			end
 		end,
 	}, {
-		Container = Roact.createElement("Frame", {
-			Size = UDim2.new(1, 0, 1, 0),
+		Container = Roact_createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 		}, {
-			UIPadding = Roact.createElement("UIPadding", {
+			UIPadding = Roact_createElement("UIPadding", {
 				PaddingLeft = UDim.new(0, 12),
 			}),
 
-			UIListLayout = Roact.createElement("UIListLayout", {
+			UIListLayout = Roact_createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = UDim.new(0, 4),
 			}),
 
-			InstanceClass = Roact.createElement(ThemedTextLabel, {
+			InstanceClass = Roact_createElement(ThemedTextLabel, {
 				object = "DimmedText",
 				state = state,
 				TextSize = 16,
@@ -91,13 +93,13 @@ function InstanceItem:render()
 				LayoutOrder = 1,
 			}),
 
-			InstanceName = Roact.createElement(ThemedTextLabel, {
+			InstanceName = Roact_createElement(ThemedTextLabel, {
 				state = state,
 				Text = props.Name,
 				LayoutOrder = 2,
 			}),
 
-			Path = Roact.createElement(ThemedTextLabel, {
+			Path = Roact_createElement(ThemedTextLabel, {
 				Font = Enum.Font.SourceSansItalic,
 				state = state,
 				Text = props.Path,

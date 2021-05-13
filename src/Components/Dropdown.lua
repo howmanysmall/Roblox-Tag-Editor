@@ -1,17 +1,19 @@
 local Button = require(script.Parent.Button)
 local ListItem = require(script.Parent.ListItem)
 local Roact = require(script.Parent.Parent.Vendor.Roact)
-local rootKey = require(script.Parent.rootKey)
 local RootPortal = require(script.Parent.RootPortal)
 local ScrollingFrame = require(script.Parent.ScrollingFrame)
 local ThemeContext = require(script.Parent.ThemeContext)
+local rootKey = require(script.Parent.rootKey)
 
 local ARROW_IMAGE = "rbxasset://textures/StudioToolbox/ArrowDownIconWhite.png"
+
+local Roact_createElement = Roact.createElement
 
 -- TODO: Convert to context api
 
 local DropdownItem = function(props)
-	return Roact.createElement(ListItem, {
+	return Roact_createElement(ListItem, {
 		ShowDivider = false,
 		Text = props.Text,
 		leftClick = props.leftClick,
@@ -40,10 +42,11 @@ end
 
 function Dropdown:render()
 	local props = self.props
+	local state = self.state
 	local children = {}
 
 	for _, option in ipairs(props.Options) do
-		children[option] = Roact.createElement(DropdownItem, {
+		children[option] = Roact_createElement(DropdownItem, {
 			Text = option,
 			Height = 26,
 			leftClick = function()
@@ -56,9 +59,9 @@ function Dropdown:render()
 		})
 	end
 
-	return Roact.createElement(ThemeContext.Consumer, {
+	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
-			return Roact.createElement(Button, {
+			return Roact_createElement(Button, {
 				Size = props.Size,
 				LayoutOrder = props.LayoutOrder,
 				Position = props.Position,
@@ -71,42 +74,42 @@ function Dropdown:render()
 						local buttonSize = rbx.AbsoluteSize
 						local viewportHeight = self._context[rootKey].current.AbsoluteSize.Y
 						local remainingHeight = viewportHeight - buttonPosition.Y - buttonSize.Y - 8
-						local listHeight = math.min(remainingHeight, self.state.dropdownHeight)
+						local listHeight = math.min(remainingHeight, state.dropdownHeight)
 
 						if remainingHeight - self.state.dropdownHeight < -60 then
 							-- There's not enough space below; put the dropdown above the button
-							list.Position = UDim2.new(0, buttonPosition.X, 0, buttonPosition.Y - self.state.dropdownHeight - 4)
-							list.Size = UDim2.new(0, buttonSize.X, 0, self.state.dropdownHeight)
+							list.Position = UDim2.fromOffset(buttonPosition.X, buttonPosition.Y - state.dropdownHeight - 4)
+							list.Size = UDim2.fromOffset(buttonSize.X, state.dropdownHeight)
 						else
-							list.Position = UDim2.new(0, buttonPosition.X, 0, buttonPosition.Y + buttonSize.Y + 4)
-							list.Size = UDim2.new(0, buttonSize.X, 0, listHeight)
+							list.Position = UDim2.fromOffset(buttonPosition.X, buttonPosition.Y + buttonSize.Y + 4)
+							list.Size = UDim2.fromOffset(buttonSize.X, listHeight)
 						end
 					end
 				end,
 
 				leftClick = function()
 					self:setState({
-						open = not self.state.open,
+						open = not state.open,
 					})
 				end,
 			}, {
-				Portal = Roact.createElement(RootPortal, nil, {
-					OptionList = Roact.createElement(ScrollingFrame, {
-						ShowBorder = true,
-						Size = UDim2.new(1, 0, 0, self.state.dropdownHeight),
-						Visible = self.state.open,
+				Portal = Roact_createElement(RootPortal, nil, {
+					OptionList = Roact_createElement(ScrollingFrame, {
 						List = true,
-						[Roact.Ref] = self._listRef,
+						ShowBorder = true,
+						Size = UDim2.new(1, 0, 0, state.dropdownHeight),
+						Visible = state.open,
 						ZIndex = 5,
+						[Roact.Ref] = self._listRef,
 					}, children),
 				}),
 
-				Arrow = Roact.createElement("ImageLabel", {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(0, 12, 0, 12),
-					Position = UDim2.new(1, -6, 0.5, 0),
+				Arrow = Roact_createElement("ImageLabel", {
 					AnchorPoint = Vector2.new(1, 0.5),
+					BackgroundTransparency = 1,
 					Image = ARROW_IMAGE,
+					Position = UDim2.new(1, -6, 0.5, 0),
+					Size = UDim2.fromOffset(12, 12),
 					-- FIXME: This needs a non-hardcoded icon color.
 					-- The studio theme API doesn't have a class for this :(
 					ImageColor3 = theme.ThemeName == "Light" and Color3.fromRGB(25, 25, 25) or Color3.fromRGB(242, 242, 242),

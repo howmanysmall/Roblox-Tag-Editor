@@ -1,12 +1,13 @@
 local Roact = require(script.Parent.Parent.Vendor.Roact)
 local TextLabel = require(script.Parent.TextLabel)
 local ThemeContext = require(script.Parent.ThemeContext)
+local Roact_createElement = Roact.createElement
 
 local function ThemedTextLabel(props)
 	local kind = props.object or "MainText"
 	local state = props.state or "Default"
 
-	return Roact.createElement(ThemeContext.Consumer, {
+	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
 			local newProps = {
 				TextColor3 = theme[kind][state],
@@ -19,7 +20,7 @@ local function ThemedTextLabel(props)
 				end
 			end
 
-			return Roact.createElement(TextLabel, newProps)
+			return Roact_createElement(TextLabel, newProps)
 		end,
 	})
 end

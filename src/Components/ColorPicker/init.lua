@@ -11,6 +11,8 @@ local ValueSlider = require(script.ValueSlider)
 
 local ColorPicker = Roact.PureComponent:extend("ColorPicker")
 
+local Roact_createElement = Roact.createElement
+
 function ColorPicker:init()
 	self:setState({
 		h = 0,
@@ -39,34 +41,36 @@ end
 
 function ColorPicker:render()
 	local props = self.props
-	local hue, sat, val = self.state.h, self.state.s, self.state.v
+	local state = self.state
+
+	local hue, sat, val = state.h, state.s, state.v
 	local color = Color3.fromHSV(hue, sat, val)
 	local red, green, blue = color.R, color.G, color.B
 
-	return Roact.createElement(ThemeContext.Consumer, {
+	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
-			return Roact.createElement(Page, {
+			return Roact_createElement(Page, {
 				visible = props.tagName ~= nil,
 				title = tostring(props.tagName) .. " - Select a Color",
 				titleIcon = props.tagIcon,
 				close = props.close,
 			}, {
-				Body = Roact.createElement("Frame", {
-					Size = UDim2.new(1, 0, 1, 0),
+				Body = Roact_createElement("Frame", {
+					Size = UDim2.fromScale(1, 1),
 					BackgroundTransparency = 1,
 				}, {
-					UIAspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
+					UIAspectRatioConstraint = Roact_createElement("UIAspectRatioConstraint", {
 						AspectRatio = 500 / 280,
 					}),
 
-					UIPadding = Roact.createElement("UIPadding", {
+					UIPadding = Roact_createElement("UIPadding", {
 						PaddingTop = UDim.new(0, 10),
 						PaddingBottom = UDim.new(0, 10),
 						PaddingLeft = UDim.new(0, 10),
 						PaddingRight = UDim.new(0, 10),
 					}),
 
-					Wheel = Roact.createElement("ImageButton", {
+					Wheel = Roact_createElement("ImageButton", {
 						Size = UDim2.new(0.5, -4, 1, 0),
 						Position = UDim2.new(),
 						BorderColor3 = theme.Border.Default,
@@ -105,16 +109,16 @@ function ColorPicker:render()
 							end
 						end,
 					}, {
-						UIAspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint"),
-						Position = Roact.createElement("Frame", {
-							Size = UDim2.new(0, 4, 0, 4),
+						UIAspectRatioConstraint = Roact_createElement("UIAspectRatioConstraint"),
+						Position = Roact_createElement("Frame", {
+							Size = UDim2.fromOffset(4, 4),
 							BorderSizePixel = 0,
-							Position = UDim2.new(hue, 0, 1 - sat, 0),
+							Position = UDim2.fromScale(hue, 1 - sat),
 							AnchorPoint = Vector2.new(0.5, 0.5),
 							BackgroundColor3 = Constants.DarkGrey,
 						}),
 
-						ValueSlider = Roact.createElement(ValueSlider, {
+						ValueSlider = Roact_createElement(ValueSlider, {
 							hue = hue,
 							sat = sat,
 							val = val,
@@ -126,18 +130,18 @@ function ColorPicker:render()
 						}),
 					}),
 
-					PropertiesPanel = Roact.createElement("Frame", {
-						Position = UDim2.new(1, 0, 0, 0),
+					PropertiesPanel = Roact_createElement("Frame", {
+						Position = UDim2.fromScale(1, 0),
 						AnchorPoint = Vector2.new(1, 0),
 						Size = UDim2.new(0.5, -8, 1, -64),
 						BackgroundTransparency = 1,
 					}, {
-						UIListLayout = Roact.createElement("UIListLayout", {
+						UIListLayout = Roact_createElement("UIListLayout", {
 							SortOrder = Enum.SortOrder.LayoutOrder,
 							Padding = UDim.new(0, 8),
 						}),
 
-						Hex = Roact.createElement(TextBox, {
+						Hex = Roact_createElement(TextBox, {
 							Size = UDim2.new(1, 0, 0, 20),
 							Text = string.format("#%02x%02x%02x", red * 255, green * 255, blue * 255),
 							Label = "Hex",
@@ -163,7 +167,7 @@ function ColorPicker:render()
 							end,
 						}),
 
-						Rgb = Roact.createElement(TextBox, {
+						Rgb = Roact_createElement(TextBox, {
 							Size = UDim2.new(1, 0, 0, 20),
 							Text = string.format("%d, %d, %d", red * 255, green * 255, blue * 255),
 							LayoutOrder = 2,
@@ -199,7 +203,7 @@ function ColorPicker:render()
 							end,
 						}),
 
-						Hsv = Roact.createElement(TextBox, {
+						Hsv = Roact_createElement(TextBox, {
 							Size = UDim2.new(1, 0, 0, 20),
 							Text = string.format("%d, %d, %d", hue * 360, sat * 100, val * 100),
 							Label = "HSV",
@@ -207,7 +211,6 @@ function ColorPicker:render()
 
 							Validate = function(text)
 								local h, s, v = string.match(text, "^%s*(%d?%d?%d)%s*,%s*(%d?%d?%d)%s*,%s*(%d?%d?%d)%s*%s*$")
-
 								if h == nil or s == nil or v == nil then
 									return false
 								end
@@ -236,7 +239,7 @@ function ColorPicker:render()
 							end,
 						}),
 
-						Preview = Roact.createElement("Frame", {
+						Preview = Roact_createElement("Frame", {
 							LayoutOrder = 4,
 							Size = UDim2.new(1, 0, 0, 48),
 							AnchorPoint = Vector2.new(0, 1),
@@ -244,31 +247,31 @@ function ColorPicker:render()
 							BorderColor3 = theme.Border.Default,
 						}),
 
-						Buttons = Roact.createElement("Frame", {
+						Buttons = Roact_createElement("Frame", {
 							LayoutOrder = 5,
 							Size = UDim2.new(1, 0, 0, 24),
 							BackgroundTransparency = 1,
 						}, {
-							UIListLayout = Roact.createElement("UIListLayout", {
+							UIListLayout = Roact_createElement("UIListLayout", {
 								FillDirection = Enum.FillDirection.Horizontal,
 								HorizontalAlignment = Enum.HorizontalAlignment.Center,
 								SortOrder = Enum.SortOrder.LayoutOrder,
 								Padding = UDim.new(0, 8),
 							}),
 
-							Cancel = Roact.createElement(Button, {
+							Cancel = Roact_createElement(Button, {
 								Text = "Cancel",
 								Size = UDim2.new(0.5, 0, 0, 24),
 								leftClick = props.close,
 								LayoutOrder = 2,
 							}),
 
-							Submit = Roact.createElement(Button, {
+							Submit = Roact_createElement(Button, {
 								LayoutOrder = 1,
 								Text = "Submit",
 								Size = UDim2.new(0.5, 0, 0, 24),
 								leftClick = function()
-									TagManager.Get():SetColor(props.tagName, Color3.fromHSV(self.state.h, self.state.s, self.state.v))
+									TagManager.Get():SetColor(props.tagName, Color3.fromHSV(state.h, state.s, state.v))
 									props.close()
 								end,
 							}),

@@ -7,6 +7,8 @@ Button.defaultProps = {
 	TextSize = 16,
 }
 
+local Roact_createElement = Roact.createElement
+
 function Button:init()
 	self:setState({
 		hover = false,
@@ -51,9 +53,9 @@ function Button:render()
 		buttonState = "Hover"
 	end
 
-	return Roact.createElement(ThemeContext.Consumer, {
+	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
-			return Roact.createElement("TextButton", {
+			return Roact_createElement("TextButton", {
 				AnchorPoint = props.AnchorPoint,
 				AutoButtonColor = false,
 				BackgroundColor3 = theme.Button[buttonState],
@@ -67,6 +69,7 @@ function Button:render()
 				TextColor3 = theme.ButtonText[buttonState],
 				TextSize = props.TextSize,
 				ZIndex = props.ZIndex,
+
 				[Roact.Event.MouseEnter] = self._mouseEnter,
 				[Roact.Event.MouseLeave] = self._mouseLeave,
 				[Roact.Event.MouseButton1Down] = self._mouseDown,

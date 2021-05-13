@@ -1,5 +1,6 @@
 local Roact = require(script.Parent.Parent.Vendor.Roact)
 local ThemeContext = require(script.Parent.ThemeContext)
+local Roact_createElement = Roact.createElement
 
 local Search = Roact.PureComponent:extend("Search")
 
@@ -11,28 +12,30 @@ function Search:init()
 end
 
 function Search:render()
+	local props = self.props
+	local state = self.state
 	local searchBarState = "Default"
 
-	if self.state.focus then
+	if state.focus then
 		searchBarState = "Selected"
-	elseif self.state.hover then
+	elseif state.hover then
 		searchBarState = "Hover"
 	end
 
-	return Roact.createElement("Frame", {
-		Size = self.props.Size,
-		Position = self.props.Position,
+	return Roact_createElement("Frame", {
+		Size = props.Size,
+		Position = props.Position,
 		BackgroundTransparency = 1,
 	}, {
-		SearchBarContainer = Roact.createElement(ThemeContext.Consumer, {
+		SearchBarContainer = Roact_createElement(ThemeContext.Consumer, {
 			render = function(theme)
-				return Roact.createElement("Frame", {
+				return Roact_createElement("Frame", {
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = UDim2.new(0.5, 0, 0.5, 0),
-					Size = UDim2.new(1, -16, 1, -16),
 					BackgroundColor3 = theme.InputFieldBackground.Default,
-					BorderSizePixel = 1,
 					BorderColor3 = theme.InputFieldBorder[searchBarState],
+					BorderSizePixel = 1,
+					Position = UDim2.fromScale(0.5, 0.5),
+					Size = UDim2.new(1, -16, 1, -16),
 
 					[Roact.Event.MouseEnter] = function()
 						self:setState({
@@ -46,27 +49,27 @@ function Search:render()
 						})
 					end,
 				}, {
-					SearchBar = Roact.createElement("TextBox", {
+					SearchBar = Roact_createElement("TextBox", {
 						AnchorPoint = Vector2.new(0.5, 0.5),
-						Position = UDim2.new(0.5, 0, 0.5, 0),
-						Size = UDim2.new(1, -20, 0, 20),
 						BackgroundTransparency = 1,
-						TextXAlignment = Enum.TextXAlignment.Left,
-						Font = Enum.Font.SourceSans,
-						TextSize = 20,
-						PlaceholderText = "Search",
-						PlaceholderColor3 = theme.DimmedText.Default,
-						TextColor3 = theme.MainText.Default,
-						Text = self.props.term,
 						ClearTextOnFocus = false,
+						Font = Enum.Font.SourceSans,
+						PlaceholderColor3 = theme.DimmedText.Default,
+						PlaceholderText = "Search",
+						Position = UDim2.fromScale(0.5, 0.5),
+						Size = UDim2.new(1, -20, 0, 20),
+						Text = props.term,
+						TextColor3 = theme.MainText.Default,
+						TextSize = 20,
+						TextXAlignment = Enum.TextXAlignment.Left,
 
 						[Roact.Change.Text] = function(rbx)
-							self.props.setTerm(rbx.Text)
+							props.setTerm(rbx.Text)
 						end,
 
-						[Roact.Event.InputBegan] = function(_, input)
-							if input.UserInputType == Enum.UserInputType.MouseButton2 and input.UserInputState == Enum.UserInputState.Begin then
-								self.props.setTerm("")
+						[Roact.Event.InputBegan] = function(_, inputObject)
+							if inputObject.UserInputType == Enum.UserInputType.MouseButton2 and inputObject.UserInputState == Enum.UserInputState.Begin then
+								props.setTerm("")
 							end
 						end,
 

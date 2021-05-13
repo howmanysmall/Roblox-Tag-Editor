@@ -7,6 +7,8 @@ local TagManager = require(script.Parent.Parent.Parent.TagManager)
 
 local WorldProvider = Roact.PureComponent:extend("WorldProvider")
 
+local Roact_oneChild = Roact.oneChild
+
 function WorldProvider:init()
 	self:setState({
 		partsList = {},
@@ -42,7 +44,7 @@ end
 function WorldProvider:didMount()
 	local manager = TagManager.Get()
 
-	for name, _ in pairs(manager:GetTags()) do
+	for name in pairs(manager:GetTags()) do
 		self:tagAdded(name)
 	end
 
@@ -94,15 +96,12 @@ end
 
 function WorldProvider:updateParts()
 	debug.profilebegin("[Tag Editor] Update WorldProvider")
-
-	local newList = {}
-
-	local cam = Workspace.CurrentCamera
-	if not cam then
+	local currentCamera = Workspace.CurrentCamera
+	if not currentCamera then
 		return
 	end
 
-	local camPos = cam.CFrame.Position
+	local camPos = currentCamera.CFrame.Position
 	local function sortFunc(a, b)
 		return a.AngularSize > b.AngularSize
 	end
@@ -113,7 +112,9 @@ function WorldProvider:updateParts()
 		return sizeM / dist
 	end
 
-	for obj, _ in pairs(self.trackedParts) do
+	local newList = {}
+
+	for obj in pairs(self.trackedParts) do
 		local class = obj.ClassName
 		if class == "Model" then
 			local primary = obj.PrimaryPart
@@ -153,7 +154,7 @@ function WorldProvider:updateParts()
 		local size = #newList
 		while size > 500 do
 			newList[size] = nil
-			size = size - 1
+			size -= 1
 		end
 	end
 
@@ -429,7 +430,7 @@ function WorldProvider:willUnmount()
 end
 
 function WorldProvider:render()
-	local render = Roact.oneChild(self.props[Roact.Children])
+	local render = Roact_oneChild(self.props[Roact.Children])
 	local partsList = self.state.partsList
 
 	return render(partsList)

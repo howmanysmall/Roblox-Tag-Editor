@@ -18,6 +18,9 @@ local TooltipView = Roact.PureComponent:extend("TooltipView")
 
 local ADDED_WIDTH = 40 or 79
 
+local Roact_createElement = Roact.createElement
+local Scheduler_Spawn = Scheduler.Spawn
+
 function TooltipView:didMount()
 	self.mouseSunk = false
 	self.steppedConn = self:_runRunServiceEvent():Connect(function()
@@ -40,9 +43,9 @@ function TooltipView:didMount()
 				local objTags = obj and CollectionService:GetTags(obj)
 
 				if objTags then
-					for i = #objTags, 1, -1 do
-						if string.sub(objTags[i], 1, 1) == "." then
-							table.remove(objTags, i)
+					for index = #objTags, 1, -1 do
+						if string.sub(objTags[index], 1, 1) == "." then
+							table.remove(objTags, index)
 						end
 					end
 				end
@@ -68,8 +71,8 @@ function TooltipView:didMount()
 		end
 
 		self:setState({
-			Part = part,
-			Tags = tags,
+			part = part,
+			tags = tags,
 		})
 	end)
 
@@ -97,9 +100,10 @@ end
 
 function TooltipView:render()
 	local props = self.props
+	local state = self.state
 
 	local children = {
-		UIListLayout = Roact.createElement("UIListLayout", {
+		UIListLayout = Roact_createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 
 			[Roact.Change.AbsoluteContentSize] = function(rbx)
@@ -117,7 +121,7 @@ function TooltipView:render()
 				if rbx.Parent and rbx.Parent.Parent then
 					--- @type UIListLayout
 					local nameRef = self.nameRef:getValue()
-					Scheduler.Spawn(function()
+					Scheduler_Spawn(function()
 						if nameRef then
 							rbx.Parent.Parent.Size = UDim2.fromOffset(math.max(nameRef.AbsoluteContentSize.X + ADDED_WIDTH, 200), absoluteContentSize.Y)
 						else
@@ -130,12 +134,12 @@ function TooltipView:render()
 			end,
 		}),
 
-		ObjectDesc = Roact.createElement("Frame", {
+		ObjectDesc = Roact_createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, 32),
 			BackgroundTransparency = 1,
 			LayoutOrder = 0,
 		}, {
-			UIListLayout = Roact.createElement("UIListLayout", {
+			UIListLayout = Roact_createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -143,27 +147,27 @@ function TooltipView:render()
 				[Roact.Ref] = self.nameRef,
 			}),
 
-			Margin = Roact.createElement("Frame", {
+			Margin = Roact_createElement("Frame", {
 				Size = UDim2.new(0, 10, 1, 0),
 				BackgroundTransparency = 1,
 			}),
 
-			InstanceClass = Roact.createElement(TextLabel, {
-				Text = self.state.Part and self.state.Part.ClassName or "",
+			InstanceClass = Roact_createElement(TextLabel, {
+				Text = state.part and state.part.ClassName or "",
 				LayoutOrder = 1,
 				TextColor3 = Constants.VeryDarkGrey,
 				Font = Enum.Font.SourceSansSemibold,
 			}),
 
-			InstanceName = Roact.createElement(TextLabel, {
-				Text = self.state.Part and self.state.Part.Name or "",
+			InstanceName = Roact_createElement(TextLabel, {
+				Text = state.part and state.part.Name or "",
 				LayoutOrder = 2,
 				Font = Enum.Font.SourceSansSemibold,
 			}),
 		}),
 	}
 
-	local tags = self.state.Tags or {}
+	local tags = state.tags or {}
 	table.sort(tags)
 
 	for _, tag in ipairs(tags) do
@@ -175,51 +179,51 @@ function TooltipView:render()
 			end
 		end
 
-		children[tag] = Roact.createElement(Tag, {
+		children[tag] = Roact_createElement(Tag, {
 			Tag = tag,
 			Icon = icon,
 		})
 	end
 
-	return Roact.createElement(Roact.Portal, {
+	return Roact_createElement(Roact.Portal, {
 		target = CoreGui,
 	}, {
-		TagEditorTooltip = Roact.createElement("ScreenGui", {
+		TagEditorTooltip = Roact_createElement("ScreenGui", {
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		}, {
-			Window = Roact.createElement("Frame", {
+			Window = Roact_createElement("Frame", {
 				BackgroundTransparency = 1,
-				Visible = self.state.Part ~= false and props.worldView,
+				Visible = state.part ~= false and props.worldView,
 
 				[Roact.Ref] = function(rbx)
 					if rbx then
 						self.mouseSteppedConn = self:_runRunServiceEvent():Connect(function()
 							local inset = GuiService:GetGuiInset()
 							local pos = UserInputService:GetMouseLocation() - inset + Vector2.new(20, 0)
-							rbx.Position = UDim2.new(0, pos.X, 0, pos.Y)
+							rbx.Position = UDim2.fromOffset(pos.X, pos.Y)
 						end)
 					else
 						self.mouseSteppedConn:Disconnect()
 					end
 				end,
 			}, {
-				HorizontalDivider = Roact.createElement("Frame", {
+				HorizontalDivider = Roact_createElement("Frame", {
 					Size = UDim2.new(1, 2, 1, 0),
-					Position = UDim2.new(0, -1, 0, 0),
+					Position = UDim2.fromOffset(-1, 0),
 					BorderSizePixel = 0,
 					BackgroundColor3 = TooltipGrey,
 				}),
 
-				VerticalDivider = Roact.createElement("Frame", {
+				VerticalDivider = Roact_createElement("Frame", {
 					Size = UDim2.new(1, 0, 1, 2),
-					Position = UDim2.new(0, 0, 0, -1),
+					Position = UDim2.fromOffset(0, -1),
 					BorderSizePixel = 0,
 					BackgroundColor3 = TooltipGrey,
 				}),
 
-				Container = Roact.createElement("Frame", {
+				Container = Roact_createElement("Frame", {
 					ZIndex = 2,
-					Size = UDim2.new(1, 0, 1, 0),
+					Size = UDim2.fromScale(1, 1),
 					BorderSizePixel = 0,
 					BackgroundColor3 = Constants.White,
 				}, children),

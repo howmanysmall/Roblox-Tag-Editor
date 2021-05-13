@@ -19,28 +19,33 @@ TagManager._global = nil
 
 local propTypes = {
 	Icon = {
-		Type = "StringValue";
-		Default = "tag_green";
-	};
+		Type = "StringValue",
+		Default = "tag_green",
+	},
+
 	Visible = {
-		Type = "BoolValue";
-		Default = true;
-	};
+		Type = "BoolValue",
+		Default = true,
+	},
+
 	Color = {
-		Type = "Color3Value";
-	};
+		Type = "Color3Value",
+	},
+
 	DrawType = {
-		Type = "StringValue";
-		Default = "Box";
-	};
+		Type = "StringValue",
+		Default = "Box",
+	},
+
 	AlwaysOnTop = {
-		Type = "BoolValue";
-		Default = false;
-	};
+		Type = "BoolValue",
+		Default = false,
+	},
+
 	Group = {
-		Type = "StringValue";
-		Default = nil;
-	};
+		Type = "StringValue",
+		Default = nil,
+	},
 }
 
 local function genColor(name)
@@ -51,6 +56,7 @@ local function genColor(name)
 		hash = (hash * prime) % base
 		hash = (hash + string.byte(name, i)) % base
 	end
+
 	local h = (hash / 2 ^ 16) % 256 / 255
 	local s = (hash / 2 ^ 8) % 256 / 255
 	local v = (hash / 2 ^ 0) % 256 / 255
@@ -109,12 +115,12 @@ function TagManager.new(store)
 			return a.Name < b.Name
 		end)
 
-		for i, oldTag in ipairs(oldTags) do
+		for index, oldTag in ipairs(oldTags) do
 			local folder = Instance.new("Folder")
 			folder.Name = oldTag.Name
-			local color = Color3.fromHSV(i / #oldTags, 1, 1)
+			local color = Color3.fromHSV(index / #oldTags, 1, 1)
 			local newTag = {
-				Folder = folder;
+				Folder = folder,
 			}
 
 			for propName, prop in pairs(propTypes) do
@@ -169,13 +175,13 @@ function TagManager:_doUpdateStore()
 		local hasAny = false
 		local missingAny = false
 		local entry = {
-			Name = name;
-			Icon = tag.Icon;
-			Visible = tag.Visible;
-			DrawType = tag.DrawType;
-			Color = tag.Color;
-			AlwaysOnTop = tag.AlwaysOnTop;
-			Group = tag.Group;
+			Name = name,
+			Icon = tag.Icon,
+			Visible = tag.Visible,
+			DrawType = tag.DrawType,
+			Color = tag.Color,
+			AlwaysOnTop = tag.AlwaysOnTop,
+			Group = tag.Group,
 		}
 
 		for _, obj in ipairs(sel) do
@@ -208,16 +214,14 @@ function TagManager:_doUpdateStore()
 	end
 
 	local unknownTags = {}
-	for tag, _ in pairs(unknownTagsMap) do
+	for tag in pairs(unknownTagsMap) do
 		table.insert(unknownTags, tag)
 	end
 
 	table.sort(unknownTags)
-
 	self.store:dispatch(Actions.SetUnknownTags(unknownTags))
 
 	local data2 = {}
-
 	for name in pairs(self.groups) do
 		table.insert(data2, {Name = name})
 	end
@@ -270,7 +274,7 @@ function TagManager:_setProp(tagName, key, value)
 		valueObj:Destroy()
 	end
 
-	for func, _ in pairs(self.onTagChangedFuncs) do
+	for func in pairs(self.onTagChangedFuncs) do
 		func(tagName, key, value)
 	end
 
@@ -289,7 +293,7 @@ function TagManager:AddTag(name)
 	folder.Name = name
 
 	local tag = {
-		Folder = folder;
+		Folder = folder,
 	}
 
 	for propName, prop in pairs(propTypes) do
@@ -306,7 +310,7 @@ function TagManager:AddTag(name)
 	folder.Parent = self:_tagsFolder()
 
 	self:_updateStore()
-	for func, _ in pairs(self.onTagAddedFuncs) do
+	for func in pairs(self.onTagAddedFuncs) do
 		func(name)
 	end
 
@@ -344,7 +348,7 @@ function TagManager:DelTag(name)
 	end
 
 	ChangeHistoryService:SetWaypoint(string.format("Deleting tag %q", name))
-	for func, _ in pairs(self.onTagRemovedFuncs) do
+	for func in pairs(self.onTagRemovedFuncs) do
 		func(name)
 	end
 
@@ -368,7 +372,7 @@ function TagManager:OnTagAdded(func)
 	return {
 		Disconnect = function()
 			self.onTagAddedFuncs[func] = nil
-		end;
+		end,
 	}
 end
 
@@ -378,7 +382,7 @@ function TagManager:OnTagRemoved(func)
 	return {
 		Disconnect = function()
 			self.onTagRemovedFuncs[func] = nil
-		end;
+		end,
 	}
 end
 
@@ -388,7 +392,7 @@ function TagManager:OnTagChanged(func)
 	return {
 		Disconnect = function()
 			self.onTagChangedFuncs[func] = nil
-		end;
+		end,
 	}
 end
 
@@ -437,7 +441,7 @@ function TagManager:AddGroup(name)
 	folder.Name = name
 
 	self.groups[name] = {
-		Folder = folder;
+		Folder = folder,
 	}
 
 	folder.Parent = self:_groupsFolder()
@@ -486,7 +490,7 @@ function TagManager:InstanceAdded(instance)
 	if instance.Parent == self.tagsFolder and not self.tags[instance.Name] then
 		-- deserialize tag
 		local tag = {
-			Folder = instance;
+			Folder = instance,
 		}
 
 		for name, prop in pairs(propTypes) do
@@ -508,7 +512,7 @@ function TagManager:InstanceAdded(instance)
 
 		self.tags[instance.Name] = tag
 
-		for func, _ in pairs(self.onTagAddedFuncs) do
+		for func in pairs(self.onTagAddedFuncs) do
 			func(instance.Name)
 		end
 
@@ -518,7 +522,7 @@ function TagManager:InstanceAdded(instance)
 	if instance.Parent == self.groupsFolder and not self.groups[instance.Name] then
 		-- deserialize group
 		local group = {
-			Folder = instance;
+			Folder = instance,
 		}
 
 		self.groups[instance.Name] = group
@@ -529,7 +533,7 @@ function TagManager:InstanceAdded(instance)
 		-- set property
 		self.tags[instance.Parent.Name][instance.Name] = instance.Value
 
-		for func, _ in pairs(self.onTagChangedFuncs) do
+		for func in pairs(self.onTagChangedFuncs) do
 			func(instance.Parent.Name, instance.Name, instance.Value)
 		end
 
@@ -545,7 +549,7 @@ function TagManager:InstanceRemoving(instance, instanceName)
 	if instance.Parent == TagsRoot and instance == self.tagsFolder then
 		self.tagsFolder = nil
 		for _ in pairs(self.tags) do
-			for func, _ in pairs(self.onTagRemovedFuncs) do
+			for func in pairs(self.onTagRemovedFuncs) do
 				func(instanceName)
 			end
 		end
@@ -561,7 +565,7 @@ function TagManager:InstanceRemoving(instance, instanceName)
 	end
 
 	if instance.Parent == self.tagsFolder and self.tags[instanceName] then
-		for func, _ in pairs(self.onTagRemovedFuncs) do
+		for func in pairs(self.onTagRemovedFuncs) do
 			func(instanceName)
 		end
 
@@ -574,7 +578,7 @@ function TagManager:InstanceRemoving(instance, instanceName)
 		for tagName, tag in pairs(self.tags) do
 			if tag.Group == instanceName then
 				tag.Group = nil
-				for func, _ in pairs(self.onTagChangedFuncs) do
+				for func in pairs(self.onTagChangedFuncs) do
 					func(tagName, "Group", nil)
 				end
 			end
@@ -585,7 +589,7 @@ function TagManager:InstanceRemoving(instance, instanceName)
 
 	if instance.Parent and instance.Parent.Parent == self.tagsFolder and self.tags[instance.Parent.Name] then
 		self.tags[instance.Parent.Name][instanceName] = nil
-		for func, _ in pairs(self.onTagChangedFuncs) do
+		for func in pairs(self.onTagChangedFuncs) do
 			func(instance.Parent.Name, instanceName, nil)
 		end
 
@@ -600,7 +604,7 @@ function TagManager:InstanceChanged(instance, oldValue, newValue)
 
 	if instance.Parent and instance.Parent.Parent == self.tagsFolder and self.tags[instance.Parent.Name] and self.tags[instance.Parent.Name][instance.Name] ~= instance.Value then
 		self.tags[instance.Parent.Name][instance.Name] = newValue
-		for func, _ in pairs(self.onTagChangedFuncs) do
+		for func in pairs(self.onTagChangedFuncs) do
 			func(instance.Parent.Name, instance.Name, newValue)
 		end
 

@@ -7,16 +7,18 @@ local RoactRodux = require(script.Parent.Parent.Vendor.RoactRodux)
 local ScrollingFrame = require(script.Parent.ScrollingFrame)
 local TagManager = require(script.Parent.Parent.TagManager)
 
+local Roact_createElement = Roact.createElement
+
 local function GroupPicker(props)
 	local children = {
-		UIPadding = Roact.createElement("UIPadding", {
+		UIPadding = Roact_createElement("UIPadding", {
 			PaddingTop = UDim.new(0, 2),
 			PaddingBottom = UDim.new(0, 2),
 			PaddingLeft = UDim.new(0, 2),
 			PaddingRight = UDim.new(0, 2),
 		}),
 
-		Default = Roact.createElement(GroupItem, {
+		Default = Roact_createElement(GroupItem, {
 			Name = "Default",
 			Group = nil,
 			Active = props.tagGroup == nil,
@@ -28,17 +30,17 @@ local function GroupPicker(props)
 		return a.Name < b.Name
 	end)
 
-	for i, entry in pairs(props.groups) do
+	for index, entry in ipairs(props.groups) do
 		local group = entry.Name
-		children["Group " .. group] = Roact.createElement(GroupItem, {
+		children["Group " .. group] = Roact_createElement(GroupItem, {
 			Name = group,
 			Group = group,
 			Active = props.tagGroup == group,
-			LayoutOrder = i,
+			LayoutOrder = index,
 		})
 	end
 
-	children.AddNew = Roact.createElement(Item, {
+	children.AddNew = Roact_createElement(Item, {
 		LayoutOrder = 99999999,
 		Text = "Add new group...",
 		Icon = "folder_add",
@@ -49,15 +51,14 @@ local function GroupPicker(props)
 		end,
 	})
 
-	return Roact.createElement(Page, {
+	return Roact_createElement(Page, {
 		visible = props.groupPicker ~= nil,
 		title = tostring(props.groupPicker) .. " - Select a Group",
 		titleIcon = props.tagIcon,
-
 		close = props.close,
 	}, {
-		Body = Roact.createElement(ScrollingFrame, {
-			Size = UDim2.new(1, 0, 1, 0),
+		Body = Roact_createElement(ScrollingFrame, {
+			Size = UDim2.fromScale(1, 1),
 			List = true,
 		}, children),
 	})

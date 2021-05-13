@@ -17,7 +17,7 @@ local Roact = require(script.Parent.Parent.Vendor.Roact)
 local Scheduler = require(script.Parent.Parent.Scheduler)
 local rootKey = require(script.Parent.rootKey)
 
-local RootPortal = Roact.Component:extend("RootPortal")
+local RootPortal = Roact.PureComponent:extend("RootPortal")
 
 function RootPortal:init()
 	self._ref = self._context[rootKey]
