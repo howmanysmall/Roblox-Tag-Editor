@@ -26,15 +26,15 @@ function ValueSlider:render()
 			local state = self.state
 
 			return Roact_createElement("ImageButton", {
-				Size = UDim2.new(1, 0, 0, 20),
-				Position = UDim2.new(0, 0, 1, 5),
 				AnchorPoint = Vector2.new(),
-				Image = "rbxassetid://1357203924",
-				ImageColor3 = Color3.fromHSV(props.hue, props.sat, 1),
 				AutoButtonColor = false,
 				BorderColor3 = theme.Border.Default,
-				[Roact.Ref] = self._rootRef,
+				Image = "rbxassetid://1357203924",
+				ImageColor3 = Color3.fromHSV(props.hue, props.sat, 1),
+				Position = UDim2.new(0, 0, 1, 5),
+				Size = UDim2.new(1, 0, 0, 20),
 
+				[Roact.Ref] = self._rootRef,
 				[Roact.Event.MouseButton1Down] = function(_, x)
 					self:setState({
 						valueMouseDown = true,
@@ -44,21 +44,21 @@ function ValueSlider:render()
 				end,
 			}, {
 				Position = Roact_createElement("ImageLabel", {
-					Size = UDim2.fromOffset(8, 5),
-					BackgroundTransparency = 1,
-					Position = UDim2.fromScale(props.val, 0),
 					AnchorPoint = Vector2.new(0.5, 0),
+					BackgroundTransparency = 1,
 					Image = "rbxassetid://2610863246",
 					-- Hardcode this color, since the color it's on top of doesn't respond to themes
 					ImageColor3 = Color3.fromRGB(255, 255, 255),
+					Position = UDim2.fromScale(props.val, 0),
+					Size = UDim2.fromOffset(8, 5),
 				}),
 
 				Portal = Roact_createElement(RootPortal, nil, {
 					ValueSliderInputCapturer = Roact_createElement("ImageButton", {
 						BackgroundTransparency = 1,
-						ZIndex = 100,
 						Size = state.valueMouseDown and UDim2.fromScale(1, 1) or UDim2.new(),
 						Visible = state.valueMouseDown,
+						ZIndex = 100,
 						[Roact.Event.MouseButton1Up] = function(_, x)
 							if state.valueMouseDown then
 								self:setState({

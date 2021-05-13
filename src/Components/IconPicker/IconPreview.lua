@@ -28,25 +28,25 @@ function IconPreview:render()
 	end
 
 	return Roact_createElement("Frame", {
-		Size = UDim2.new(1, 0, 0, 56),
-		Position = props.Position,
-		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(),
+		BackgroundTransparency = 1,
+		Position = props.Position,
+		Size = UDim2.new(1, 0, 0, 56),
 	}, {
 		IconName = Roact_createElement(ThemedTextLabel, {
-			TextSize = 14,
-			Size = UDim2.new(1, -56, 0, 20 * 3),
 			Position = UDim2.fromOffset(56, 32),
-			TextWrapped = true,
+			Size = UDim2.new(1, -56, 0, 20 * 3),
 			Text = props.icon or "",
+			TextSize = 14,
+			TextWrapped = true,
 			TextYAlignment = Enum.TextYAlignment.Top,
 		}),
 
 		IconMagnify = Roact_createElement("Frame", {
-			Size = UDim2.fromOffset(48, 48),
-			BorderColor3 = Constants.DarkGrey,
 			BackgroundColor3 = Constants.White,
 			BackgroundTransparency = 1,
+			BorderColor3 = Constants.DarkGrey,
+			Size = UDim2.fromOffset(48, 48),
 
 			[Roact.Ref] = function(rbx)
 				if rbx == self.oldRbx then
@@ -65,15 +65,15 @@ function IconPreview:render()
 				if rbx then
 					for x = 0, 15 do
 						for y = 0, 15 do
-							local image = Instance.new("ImageLabel")
-							image.Name = string.format("Pixel [%d, %d]", x, y)
-							image.Image = Icons.Asset
-							image.ImageRectSize = Vector2.new()
-							image.Size = UDim2.fromOffset(scaleFactor, scaleFactor)
-							image.Position = UDim2.fromOffset(x * scaleFactor, y * scaleFactor)
-							image.BackgroundTransparency = 1
-							image.Parent = rbx
-							self.pixels[x * 16 + y] = image
+							local imageLabel = Instance.new("ImageLabel")
+							imageLabel.Name = string.format("Pixel [%d, %d]", x, y)
+							imageLabel.Image = Icons.Asset
+							imageLabel.ImageRectSize = Vector2.new()
+							imageLabel.Size = UDim2.fromOffset(scaleFactor, scaleFactor)
+							imageLabel.Position = UDim2.fromOffset(x * scaleFactor, y * scaleFactor)
+							imageLabel.BackgroundTransparency = 1
+							imageLabel.Parent = rbx
+							self.pixels[x * 16 + y] = imageLabel
 						end
 					end
 
@@ -90,7 +90,7 @@ local function mapStateToProps(state)
 	if icon == nil then
 		local tagName = state.IconPicker
 
-		for _, tag in pairs(state.TagData) do
+		for _, tag in ipairs(state.TagData) do
 			if tag.Name == tagName then
 				icon = tag.Icon
 				break

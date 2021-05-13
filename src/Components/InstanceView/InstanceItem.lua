@@ -40,17 +40,17 @@ function InstanceItem:render()
 		end,
 
 		leftClick = function()
-			local sel = Selection:Get()
-			local alreadySelected = table.find(sel, props.Instance) ~= nil
+			local currentSelection = Selection:Get()
+			local alreadySelected = table.find(currentSelection, props.Instance) ~= nil
 
 			if alreadySelected then
-				if #sel > 1 then
+				if #currentSelection > 1 then
 					-- select only this
 					Selection:Set({props.Instance})
 				else
 					-- deselect
 					local baseSel = {}
-					for _, instance in ipairs(sel) do
+					for _, instance in ipairs(currentSelection) do
 						if instance ~= props.Instance then
 							table.insert(baseSel, instance)
 						end
@@ -62,7 +62,7 @@ function InstanceItem:render()
 				-- select
 				local baseSel = {}
 				if isDown("LeftControl") or isDown("RightControl") or isDown("LeftShift") or isDown("RightShift") then
-					baseSel = sel
+					baseSel = currentSelection
 				end
 
 				table.insert(baseSel, props.Instance)
@@ -71,40 +71,41 @@ function InstanceItem:render()
 		end,
 	}, {
 		Container = Roact_createElement("Frame", {
-			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1),
 		}, {
 			UIPadding = Roact_createElement("UIPadding", {
 				PaddingLeft = UDim.new(0, 12),
 			}),
 
 			UIListLayout = Roact_createElement("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = UDim.new(0, 4),
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
 			}),
 
 			InstanceClass = Roact_createElement(ThemedTextLabel, {
+				LayoutOrder = 1,
+				Text = props.ClassName,
+				TextSize = 16,
+
 				object = "DimmedText",
 				state = state,
-				TextSize = 16,
-				Text = props.ClassName,
-				LayoutOrder = 1,
 			}),
 
 			InstanceName = Roact_createElement(ThemedTextLabel, {
-				state = state,
-				Text = props.Name,
 				LayoutOrder = 2,
+				Text = props.Name,
+				state = state,
 			}),
 
 			Path = Roact_createElement(ThemedTextLabel, {
 				Font = Enum.Font.SourceSansItalic,
-				state = state,
-				Text = props.Path,
 				LayoutOrder = 3,
+				Text = props.Path,
 				TextSize = 16,
+				state = state,
 			}),
 		}),
 	})

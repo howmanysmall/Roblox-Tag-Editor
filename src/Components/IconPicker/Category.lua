@@ -68,32 +68,32 @@ function Category:render()
 	end
 
 	return Roact_createElement("Frame", {
-		Size = UDim2.fromScale(1, 0),
-		LayoutOrder = props.LayoutOrder,
 		BackgroundTransparency = 1,
+		LayoutOrder = props.LayoutOrder,
+		Size = UDim2.fromScale(1, 0),
 		Visible = numMatched > 0,
 	}, {
 		Label = Roact_createElement(ThemedTextLabel, {
-			Text = props.CategoryName,
-			Size = UDim2.new(1, 0, 0, 20),
 			Font = Enum.Font.SourceSansSemibold,
+			Size = UDim2.new(1, 0, 0, 20),
+			Text = props.CategoryName,
 		}),
 
 		Body = Roact_createElement("Frame", {
-			Size = UDim2.fromScale(1, 0),
-			Position = UDim2.fromOffset(0, 20),
 			BackgroundTransparency = 1,
+			Position = UDim2.fromOffset(0, 20),
+			Size = UDim2.fromScale(1, 0),
 
 			[Roact.Change.AbsoluteSize] = function(rbx)
 				Scheduler_Spawn(function()
 					local stride = cellSize
 					local epsilon = 0.001
-					local w = math.floor(rbx.AbsoluteSize.X / stride + epsilon)
-					local h = math.ceil(numMatched / w)
+					local width = math.floor(rbx.AbsoluteSize.X / stride + epsilon)
+					local height = math.ceil(numMatched / width)
 
-					rbx.Size = UDim2.new(1, 0, 0, h * stride)
+					rbx.Size = UDim2.new(1, 0, 0, height * stride)
 					if rbx.Parent then
-						rbx.Parent.Size = UDim2.new(1, 0, 0, h * stride + 24)
+						rbx.Parent.Size = UDim2.new(1, 0, 0, height * stride + 24)
 					end
 				end)
 			end,

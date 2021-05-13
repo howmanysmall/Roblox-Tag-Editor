@@ -14,11 +14,11 @@ local IconPicker = Roact.PureComponent:extend("IconPicker")
 local Roact_createElement = Roact.createElement
 
 function IconPicker:init()
-	self.closeFunc = function()
+	self.closeFunction = function()
 		self.props.close()
 	end
 
-	self.onHoverFunc = function(icon)
+	self.onHoverFunction = function(icon)
 		self.props.setHoveredIcon(icon)
 	end
 end
@@ -28,64 +28,69 @@ function IconPicker:shouldUpdate(newProps)
 	return props.tagName ~= newProps.tagName or props.search ~= newProps.search
 end
 
+local function sortCategories(a, b)
+	local aName = a.Name
+	local bName = b.Name
+
+	local aIsUncat = aName == "Uncategorized" and 1 or 0
+	local bIsUncat = bName == "Uncategorized" and 1 or 0
+
+	if aIsUncat < bIsUncat then
+		return true
+	end
+
+	if bIsUncat < aIsUncat then
+		return false
+	end
+
+	return aName < bName
+end
+
 function IconPicker:render()
 	local props = self.props
 	local children = {}
-	local cats = {}
+	local categories = {}
 	for name, icons in pairs(IconCategories) do
-		table.insert(cats, {
+		table.insert(categories, {
 			Name = name,
 			Icons = icons,
 		})
 	end
 
-	table.sort(cats, function(a, b)
-		local aIsUncat = a.Name == "Uncategorized" and 1 or 0
-		local bIsUncat = b.Name == "Uncategorized" and 1 or 0
+	table.sort(categories, sortCategories)
 
-		if aIsUncat < bIsUncat then
-			return true
-		end
-
-		if bIsUncat < aIsUncat then
-			return false
-		end
-
-		return a.Name < b.Name
-	end)
-
-	for index, cat in ipairs(cats) do
-		local name = cat.Name
-		local icons = cat.Icons
+	for index, category in ipairs(categories) do
+		local name = category.Name
+		local icons = category.Icons
 		children[name] = Roact_createElement(Category, {
-			LayoutOrder = index,
 			CategoryName = name,
 			Icons = icons,
-			tagName = props.tagName,
+			LayoutOrder = index,
+
+			close = self.closeFunction,
+			onHover = self.onHoverFunction,
 			search = props.search,
-			close = self.closeFunc,
-			onHover = self.onHoverFunc,
+			tagName = props.tagName,
 		})
 	end
 
 	children.UIPadding = Roact_createElement("UIPadding", {
+		PaddingBottom = UDim.new(0, 4),
 		PaddingLeft = UDim.new(0, 4),
 		PaddingRight = UDim.new(0, 4),
 		PaddingTop = UDim.new(0, 4),
-		PaddingBottom = UDim.new(0, 4),
 	})
 
 	return Roact_createElement(Page, {
-		visible = props.tagName ~= nil,
+		close = props.close,
 		title = tostring(props.tagName) .. " - Select an Icon",
 		titleIcon = props.tagIcon,
-
-		close = props.close,
+		visible = props.tagName ~= nil,
 	}, {
 		IconList = Roact_createElement(ScrollingFrame, {
-			Size = UDim2.new(1, 0, 1, -64),
-			Position = UDim2.fromOffset(0, 64),
 			List = true,
+			Position = UDim2.fromOffset(0, 64),
+			Size = UDim2.new(1, 0, 1, -64),
 		}, children),
 
 		TopBar = Roact_createElement(ThemeContext.Consumer, {
@@ -97,11 +102,11 @@ function IconPicker:render()
 					ZIndex = 2,
 				}, {
 					Search = Roact_createElement(Search, {
-						Size = UDim2.new(1, -56, 0, 40),
 						Position = UDim2.fromOffset(56, 0),
+						Size = UDim2.new(1, -56, 0, 40),
 
-						term = props.search,
 						setTerm = props.setTerm,
+						term = props.search,
 					}),
 
 					Preview = Roact_createElement(IconPreview, {
@@ -110,11 +115,11 @@ function IconPicker:render()
 
 					Separator = Roact_createElement("Frame", {
 						-- This separator acts as a bottom border, so we should use the border color, not the separator color
+						AnchorPoint = Vector2.new(0, 1),
 						BackgroundColor3 = theme.Border.Default,
 						BorderSizePixel = 0,
-						Size = UDim2.new(1, 0, 0, 1),
 						Position = UDim2.fromScale(0, 1),
-						AnchorPoint = Vector2.new(0, 1),
+						Size = UDim2.new(1, 0, 0, 1),
 						ZIndex = 2,
 					}),
 				})
@@ -126,7 +131,8 @@ end
 local function mapStateToProps(state)
 	local tagName = state.IconPicker
 	local tagIcon
-	for _, tag in pairs(state.TagData) do
+
+	for _, tag in ipairs(state.TagData) do
 		if tag.Name == tagName then
 			tagIcon = tag.Icon
 			break
@@ -134,9 +140,9 @@ local function mapStateToProps(state)
 	end
 
 	return {
-		tagName = tagName,
-		tagIcon = tagIcon,
 		search = state.IconSearch,
+		tagIcon = tagIcon,
+		tagName = tagName,
 	}
 end
 
@@ -146,12 +152,12 @@ local function mapDispatchToProps(dispatch)
 			dispatch(Actions.ToggleIconPicker(nil))
 		end,
 
-		setTerm = function(term)
-			dispatch(Actions.SetIconSearch(term))
-		end,
-
 		setHoveredIcon = function(icon)
 			dispatch(Actions.SetHoveredIcon(icon))
+		end,
+
+		setTerm = function(term)
+			dispatch(Actions.SetIconSearch(term))
 		end,
 	}
 end

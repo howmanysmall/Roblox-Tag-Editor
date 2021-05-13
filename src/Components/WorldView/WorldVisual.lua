@@ -32,10 +32,10 @@ local function WorldVisual(props)
 
 		children[key] = Roact_createElement(elt, {
 			Adornee = entry.Part,
-			Icon = entry.Icon,
-			Color = entry.Color,
-			TagName = entry.TagName,
 			AlwaysOnTop = entry.AlwaysOnTop,
+			Color = entry.Color,
+			Icon = entry.Icon,
+			TagName = entry.TagName,
 		})
 	end
 

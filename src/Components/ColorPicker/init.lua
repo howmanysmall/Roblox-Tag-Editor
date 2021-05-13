@@ -21,7 +21,7 @@ function ColorPicker:init()
 	})
 end
 
-function ColorPicker.getDerivedStateFromProps(nextProps)
+function ColorPicker.getDerivedStateFromProps(nextProps, lastState)
 	if nextProps.tagColor == nil then
 		return {
 			h = 0,
@@ -30,13 +30,17 @@ function ColorPicker.getDerivedStateFromProps(nextProps)
 		}
 	end
 
-	local h, s, v = Color3.toHSV(nextProps.tagColor)
-	return {
-		-- When we open a fresh color picker, it should default to the color that the tag already was
-		h = h,
-		s = s,
-		v = v,
-	}
+	if lastState.tagColor ~= nextProps.tagColor then
+		lastState.tagColor = nextProps.tagColor
+		local h, s, v = Color3.toHSV(nextProps.tagColor)
+		return {
+			-- When we open a fresh color picker, it should default to the color that the tag already was
+			h = h,
+			s = s,
+			v = v,
+			tagColor = nextProps.tagColor,
+		}
+	end
 end
 
 function ColorPicker:render()
@@ -50,34 +54,34 @@ function ColorPicker:render()
 	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
 			return Roact_createElement(Page, {
-				visible = props.tagName ~= nil,
+				close = props.close,
 				title = tostring(props.tagName) .. " - Select a Color",
 				titleIcon = props.tagIcon,
-				close = props.close,
+				visible = props.tagName ~= nil,
 			}, {
 				Body = Roact_createElement("Frame", {
-					Size = UDim2.fromScale(1, 1),
 					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(1, 1),
 				}, {
 					UIAspectRatioConstraint = Roact_createElement("UIAspectRatioConstraint", {
 						AspectRatio = 500 / 280,
 					}),
 
 					UIPadding = Roact_createElement("UIPadding", {
-						PaddingTop = UDim.new(0, 10),
 						PaddingBottom = UDim.new(0, 10),
 						PaddingLeft = UDim.new(0, 10),
 						PaddingRight = UDim.new(0, 10),
+						PaddingTop = UDim.new(0, 10),
 					}),
 
 					Wheel = Roact_createElement("ImageButton", {
-						Size = UDim2.new(0.5, -4, 1, 0),
-						Position = UDim2.new(),
+						AutoButtonColor = false,
+						BackgroundColor3 = Constants.Black,
 						BorderColor3 = theme.Border.Default,
 						Image = "rbxassetid://1357075261",
-						BackgroundColor3 = Constants.Black,
-						AutoButtonColor = false,
 						ImageTransparency = 1 - val,
+						Position = UDim2.new(),
+						Size = UDim2.new(0.5, -4, 1, 0),
 
 						[Roact.Event.MouseButton1Down] = function()
 							self:setState({
@@ -85,37 +89,37 @@ function ColorPicker:render()
 							})
 						end,
 
-						[Roact.Event.InputEnded] = function(rbx, input)
-							if input.UserInputType == Enum.UserInputType.MouseButton1 and self.state.wheelMouseDown then
-								local x, y = input.Position.X, input.Position.Y
-								local pos = (Vector2.new(x, y) - rbx.AbsolutePosition) / rbx.AbsoluteSize
-								pos = Vector2.new(math.clamp(pos.X, 0, 1), math.clamp(pos.Y, 0, 1))
+						[Roact.Event.InputEnded] = function(rbx, inputObject)
+							if inputObject.UserInputType == Enum.UserInputType.MouseButton1 and self.state.wheelMouseDown then
+								local x, y = inputObject.Position.X, inputObject.Position.Y
+								local position = (Vector2.new(x, y) - rbx.AbsolutePosition) / rbx.AbsoluteSize
+								position = Vector2.new(math.clamp(position.X, 0, 1), math.clamp(position.Y, 0, 1))
 								self:setState({
-									h = pos.X,
-									s = 1 - pos.Y,
+									h = position.X,
+									s = 1 - position.Y,
 									wheelMouseDown = false,
 								})
 							end
 						end,
 
-						[Roact.Event.InputChanged] = function(rbx, input)
-							if self.state.wheelMouseDown and input.UserInputType == Enum.UserInputType.MouseMovement then
-								local pos = (Vector2.new(input.Position.X, input.Position.Y) - rbx.AbsolutePosition) / rbx.AbsoluteSize
+						[Roact.Event.InputChanged] = function(rbx, inputObject)
+							if state.wheelMouseDown and inputObject.UserInputType == Enum.UserInputType.MouseMovement then
+								local position = (Vector2.new(inputObject.Position.X, inputObject.Position.Y) - rbx.AbsolutePosition) / rbx.AbsoluteSize
 
 								self:setState({
-									h = pos.X,
-									s = 1 - pos.Y,
+									h = position.X,
+									s = 1 - position.Y,
 								})
 							end
 						end,
 					}, {
 						UIAspectRatioConstraint = Roact_createElement("UIAspectRatioConstraint"),
 						Position = Roact_createElement("Frame", {
-							Size = UDim2.fromOffset(4, 4),
-							BorderSizePixel = 0,
-							Position = UDim2.fromScale(hue, 1 - sat),
 							AnchorPoint = Vector2.new(0.5, 0.5),
 							BackgroundColor3 = Constants.DarkGrey,
+							BorderSizePixel = 0,
+							Position = UDim2.fromScale(hue, 1 - sat),
+							Size = UDim2.fromOffset(4, 4),
 						}),
 
 						ValueSlider = Roact_createElement(ValueSlider, {
@@ -131,25 +135,21 @@ function ColorPicker:render()
 					}),
 
 					PropertiesPanel = Roact_createElement("Frame", {
-						Position = UDim2.fromScale(1, 0),
 						AnchorPoint = Vector2.new(1, 0),
-						Size = UDim2.new(0.5, -8, 1, -64),
 						BackgroundTransparency = 1,
+						Position = UDim2.fromScale(1, 0),
+						Size = UDim2.new(0.5, -8, 1, -64),
 					}, {
 						UIListLayout = Roact_createElement("UIListLayout", {
-							SortOrder = Enum.SortOrder.LayoutOrder,
 							Padding = UDim.new(0, 8),
+							SortOrder = Enum.SortOrder.LayoutOrder,
 						}),
 
 						Hex = Roact_createElement(TextBox, {
-							Size = UDim2.new(1, 0, 0, 20),
-							Text = string.format("#%02x%02x%02x", red * 255, green * 255, blue * 255),
 							Label = "Hex",
 							LayoutOrder = 1,
-
-							Validate = function(text)
-								return string.match(text, "^%s*#?(%x%x%x%x%x%x)%s*$") ~= nil
-							end,
+							Size = UDim2.new(1, 0, 0, 20),
+							Text = string.format("#%02x%02x%02x", red * 255, green * 255, blue * 255),
 
 							TextChanged = function(text)
 								local r, g, b = string.match(text, "^%s*#?(%x%x)(%x%x)(%x%x)%s*$")
@@ -165,27 +165,17 @@ function ColorPicker:render()
 									v = newV,
 								})
 							end,
+
+							Validate = function(text)
+								return string.match(text, "^%s*#?(%x%x%x%x%x%x)%s*$") ~= nil
+							end,
 						}),
 
 						Rgb = Roact_createElement(TextBox, {
+							Label = "RGB",
+							LayoutOrder = 2,
 							Size = UDim2.new(1, 0, 0, 20),
 							Text = string.format("%d, %d, %d", red * 255, green * 255, blue * 255),
-							LayoutOrder = 2,
-							Label = "RGB",
-
-							Validate = function(text)
-								local r, g, b = string.match(text, "^%s*(%d?%d?%d)%s*,%s*(%d?%d?%d)%s*,%s*(%d?%d?%d)%s*%s*$")
-
-								if r == nil or g == nil or b == nil then
-									return false
-								end
-
-								if tonumber(r) > 255 or tonumber(g) > 255 or tonumber(b) > 255 then
-									return false
-								end
-
-								return true
-							end,
 
 							TextChanged = function(text)
 								local r, g, b = string.match(text, "^%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*%s*$")
@@ -201,13 +191,38 @@ function ColorPicker:render()
 									v = newV,
 								})
 							end,
+
+							Validate = function(text)
+								local r, g, b = string.match(text, "^%s*(%d?%d?%d)%s*,%s*(%d?%d?%d)%s*,%s*(%d?%d?%d)%s*%s*$")
+								if r == nil or g == nil or b == nil then
+									return false
+								end
+
+								if tonumber(r) > 255 or tonumber(g) > 255 or tonumber(b) > 255 then
+									return false
+								end
+
+								return true
+							end,
 						}),
 
 						Hsv = Roact_createElement(TextBox, {
-							Size = UDim2.new(1, 0, 0, 20),
-							Text = string.format("%d, %d, %d", hue * 360, sat * 100, val * 100),
 							Label = "HSV",
 							LayoutOrder = 3,
+							Size = UDim2.new(1, 0, 0, 20),
+							Text = string.format("%d, %d, %d", hue * 360, sat * 100, val * 100),
+
+							TextChanged = function(text)
+								local h, s, v = string.match(text, "^%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*%s*$")
+								h = tonumber(h) / 360
+								s = tonumber(s) / 100
+								v = tonumber(v) / 100
+								self:setState({
+									h = h,
+									s = s,
+									v = v,
+								})
+							end,
 
 							Validate = function(text)
 								local h, s, v = string.match(text, "^%s*(%d?%d?%d)%s*,%s*(%d?%d?%d)%s*,%s*(%d?%d?%d)%s*%s*$")
@@ -225,51 +240,39 @@ function ColorPicker:render()
 
 								return true
 							end,
-
-							TextChanged = function(text)
-								local h, s, v = string.match(text, "^%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*%s*$")
-								h = tonumber(h) / 360
-								s = tonumber(s) / 100
-								v = tonumber(v) / 100
-								self:setState({
-									h = h,
-									s = s,
-									v = v,
-								})
-							end,
 						}),
 
 						Preview = Roact_createElement("Frame", {
-							LayoutOrder = 4,
-							Size = UDim2.new(1, 0, 0, 48),
 							AnchorPoint = Vector2.new(0, 1),
 							BackgroundColor3 = color,
 							BorderColor3 = theme.Border.Default,
+							LayoutOrder = 4,
+							Size = UDim2.new(1, 0, 0, 48),
 						}),
 
 						Buttons = Roact_createElement("Frame", {
+							BackgroundTransparency = 1,
 							LayoutOrder = 5,
 							Size = UDim2.new(1, 0, 0, 24),
-							BackgroundTransparency = 1,
 						}, {
 							UIListLayout = Roact_createElement("UIListLayout", {
 								FillDirection = Enum.FillDirection.Horizontal,
 								HorizontalAlignment = Enum.HorizontalAlignment.Center,
-								SortOrder = Enum.SortOrder.LayoutOrder,
 								Padding = UDim.new(0, 8),
+								SortOrder = Enum.SortOrder.LayoutOrder,
 							}),
 
 							Cancel = Roact_createElement(Button, {
-								Text = "Cancel",
-								Size = UDim2.new(0.5, 0, 0, 24),
-								leftClick = props.close,
 								LayoutOrder = 2,
+								leftClick = props.close,
+								Size = UDim2.new(0.5, 0, 0, 24),
+								Text = "Cancel",
 							}),
 
 							Submit = Roact_createElement(Button, {
 								LayoutOrder = 1,
-								Text = "Submit",
 								Size = UDim2.new(0.5, 0, 0, 24),
+								Text = "Submit",
 								leftClick = function()
 									TagManager.Get():SetColor(props.tagName, Color3.fromHSV(state.h, state.s, state.v))
 									props.close()
@@ -287,7 +290,7 @@ local function mapStateToProps(state)
 	local tag = state.ColorPicker
 	local tagIcon
 	local tagColor
-	for _, entry in pairs(state.TagData) do
+	for _, entry in ipairs(state.TagData) do
 		if entry.Name == tag then
 			tagIcon = entry.Icon
 			tagColor = entry.Color

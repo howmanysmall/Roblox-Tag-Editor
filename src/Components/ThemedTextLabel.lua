@@ -10,8 +10,8 @@ local function ThemedTextLabel(props)
 	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
 			local newProps = {
-				TextColor3 = theme[kind][state],
 				Font = Enum.Font.SourceSans,
+				TextColor3 = theme[kind][state],
 			}
 
 			for key, value in pairs(props) do

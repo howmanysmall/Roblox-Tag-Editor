@@ -29,11 +29,10 @@ local function TextLabel(props)
 
 	return Roact_createElement("TextLabel", {
 		BackgroundTransparency = 1,
+		Font = props.Font or Enum.Font.SourceSans,
 		LayoutOrder = props.LayoutOrder,
 		Position = props.Position,
 		Size = props.Size or props.TextWrapped and UDim2.fromScale(1, 0) or nil,
-
-		Font = props.Font or Enum.Font.SourceSans,
 		Text = props.Text or "<Text Not Set>",
 		TextColor3 = props.TextColor3 or Color3.new(),
 		TextSize = props.TextSize or 20,
@@ -41,10 +40,10 @@ local function TextLabel(props)
 		TextXAlignment = props.TextXAlignment or Enum.TextXAlignment.Left,
 		TextYAlignment = props.TextYAlignment,
 
-		[Roact.Ref] = autoSize and update or nil,
-		[Roact.Change.TextBounds] = autoSize and update or nil,
 		[Roact.Change.AbsoluteSize] = autoSize and update or nil,
 		[Roact.Change.Parent] = autoSize and update or nil,
+		[Roact.Change.TextBounds] = autoSize and update or nil,
+		[Roact.Ref] = autoSize and update or nil,
 	})
 end
 

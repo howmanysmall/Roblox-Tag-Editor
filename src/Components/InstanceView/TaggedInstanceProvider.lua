@@ -23,18 +23,51 @@ function TaggedInstanceProvider:init()
 	})
 end
 
+local function sortParts(a, b)
+	local aPath = a.path
+	local bPath = b.path
+	if aPath < bPath then
+		return true
+	end
+
+	if bPath < aPath then
+		return false
+	end
+
+	local aInstance = a.instance
+	local bInstance = b.instance
+	if aInstance.Name < bInstance.Name then
+		return true
+	end
+
+	if bInstance.Name < bInstance.Name then
+		return false
+	end
+
+	local aClassName = aInstance.ClassName
+	local bClassName = bInstance.ClassName
+	if aClassName < bClassName then
+		return true
+	end
+
+	if bClassName < bClassName then
+		return false
+	end
+
+	return false
+end
+
 function TaggedInstanceProvider:updateState(tagName)
 	local selected = {}
 	for _, instance in ipairs(Selection:Get()) do
 		selected[instance] = true
 	end
 
-	local parts = {}
+	local parts
 	if tagName then
-		print("tagName exists:", tagName)
 		parts = CollectionService:GetTagged(tagName)
 	else
-		print("no tagName")
+		parts = {}
 	end
 
 	for index, part in ipairs(parts) do
@@ -59,33 +92,7 @@ function TaggedInstanceProvider:updateState(tagName)
 		}
 	end
 
-	table.sort(parts, function(a, b)
-		if a.path < b.path then
-			return true
-		end
-
-		if b.path < a.path then
-			return false
-		end
-
-		if a.instance.Name < b.instance.Name then
-			return true
-		end
-
-		if b.instance.Name < b.instance.Name then
-			return false
-		end
-
-		if a.instance.ClassName < b.instance.ClassName then
-			return true
-		end
-
-		if b.instance.ClassName < b.instance.ClassName then
-			return false
-		end
-
-		return false
-	end)
+	table.sort(parts, sortParts)
 
 	self:setState({
 		parts = parts,
@@ -96,7 +103,7 @@ function TaggedInstanceProvider:updateState(tagName)
 end
 
 function TaggedInstanceProvider:didUpdate(prevProps)
-	local tagName = self.state.tagName
+	local tagName = self.props.tagName
 
 	if tagName ~= prevProps.tagName then
 		local parts = self:updateState(tagName)
@@ -138,8 +145,10 @@ function TaggedInstanceProvider:didUpdate(prevProps)
 			self.instanceRemovedConn = CollectionService:GetInstanceRemovedSignal(tagName):Connect(function(inst)
 				self.nameChangedConns[inst]:Disconnect()
 				self.nameChangedConns[inst] = nil
+
 				self.ancestryChangedConns[inst]:Disconnect()
 				self.ancestryChangedConns[inst] = nil
+
 				self:updateState(tagName)
 			end)
 		end

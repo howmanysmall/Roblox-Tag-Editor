@@ -8,10 +8,10 @@ local Roact_createElement = Roact.createElement
 
 local function GroupItem(props)
 	return Roact_createElement(Item, {
-		Icon = "folder",
-		Text = props.Name,
 		Active = props.Active,
+		Icon = "folder",
 		LayoutOrder = props.LayoutOrder,
+		Text = props.Name,
 
 		leftClick = function()
 			TagManager.Get():SetGroup(props.Tag, props.Group)

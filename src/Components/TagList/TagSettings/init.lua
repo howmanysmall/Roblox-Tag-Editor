@@ -17,22 +17,22 @@ local function TagSettings(props)
 		Size = UDim2.fromScale(1, 1),
 	}, {
 		SideButtons = Roact_createElement("Frame", {
-			Size = UDim2.fromScale(0.4, 1),
 			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(0.4, 1),
 		}, {
 			Padding = Roact_createElement("UIPadding", {
-				PaddingTop = UDim.new(0, 5),
 				PaddingBottom = UDim.new(0, 5),
-				PaddingRight = UDim.new(0, 5),
 				PaddingLeft = UDim.new(0, 5),
+				PaddingRight = UDim.new(0, 5),
+				PaddingTop = UDim.new(0, 5),
 			}),
 
 			Layout = Roact_createElement("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				FillDirection = Enum.FillDirection.Vertical,
-				VerticalAlignment = Enum.VerticalAlignment.Top,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				Padding = UDim.new(0, 5),
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Top,
 			}),
 
 			ChangeIcon = Roact_createElement(Button, {
@@ -74,16 +74,16 @@ local function TagSettings(props)
 		}),
 
 		Visualization = Roact_createElement("Frame", {
-			Size = UDim2.new(0.6, -10, 1, 0),
-			Position = UDim2.new(1, -5, 0, 0),
 			AnchorPoint = Vector2.new(1, 0),
 			BackgroundTransparency = 1,
+			Position = UDim2.new(1, -5, 0, 0),
+			Size = UDim2.new(0.6, -10, 1, 0),
 		}, {
 			Padding = Roact_createElement("UIPadding", {
-				PaddingTop = UDim.new(0, 5),
 				PaddingBottom = UDim.new(0, 5),
-				PaddingRight = UDim.new(0, 5),
 				PaddingLeft = UDim.new(0, 5),
+				PaddingRight = UDim.new(0, 5),
+				PaddingTop = UDim.new(0, 5),
 			}),
 
 			Layout = Roact_createElement("UIListLayout", {
@@ -92,8 +92,8 @@ local function TagSettings(props)
 			}),
 
 			Title = Roact_createElement(TextLabel, {
-				Size = UDim2.new(1, 0, 0, 30),
 				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 0, 30),
 				Text = "Tag Visualization",
 				TextSize = 20,
 			}),
@@ -109,11 +109,11 @@ local function TagSettings(props)
 				ColorVisualization = Roact_createElement(ThemeContext.Consumer, {
 					render = function(theme)
 						return Roact_createElement("Frame", {
-							Size = UDim2.new(1, -10, 1, -10),
-							Position = UDim2.new(1, -5, 0.5, 0),
 							AnchorPoint = Vector2.new(1, 0.5),
 							BackgroundColor3 = props.tagColor,
 							BorderColor3 = theme.Border.Default,
+							Position = UDim2.new(1, -5, 0.5, 0),
+							Size = UDim2.new(1, -10, 1, -10),
 						}, {
 							ARConstraint = Roact_createElement("UIAspectRatioConstraint", {
 								AspectRatio = 1,
@@ -125,17 +125,17 @@ local function TagSettings(props)
 			}),
 
 			AlwaysOnTop = Roact_createElement("ImageButton", {
-				LayoutOrder = 3,
 				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 0, 30),
+				LayoutOrder = 3,
 				Position = UDim2.fromOffset(0, 40),
+				Size = UDim2.new(1, 0, 0, 30),
 				[Roact.Event.MouseButton1Click] = function()
 					TagManager.Get():SetAlwaysOnTop(props.tagMenu, not props.tagAlwaysOnTop)
 				end,
 			}, {
 				Padding = Roact_createElement("UIPadding", {
-					PaddingTop = UDim.new(0, 5),
 					PaddingBottom = UDim.new(0, 5),
+					PaddingTop = UDim.new(0, 5),
 				}),
 
 				Check = Roact_createElement(Checkbox, {
@@ -146,36 +146,36 @@ local function TagSettings(props)
 				}),
 
 				Label = Roact_createElement(TextLabel, {
-					Size = UDim2.new(1, -30, 1, 0),
 					Position = UDim2.fromOffset(30, 0),
+					Size = UDim2.new(1, -30, 1, 0),
 					Text = "Always on top",
 					TextSize = 16,
 				}),
 			}),
 
 			VisualizationKind = Roact_createElement("Frame", {
-				Size = UDim2.new(1, 0, 0, 30),
 				BackgroundTransparency = 1,
 				LayoutOrder = 4,
+				Size = UDim2.new(1, 0, 0, 30),
 			}, {
 				Layout = Roact_createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
 					FillDirection = Enum.FillDirection.Horizontal,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
 					Padding = UDim.new(0, 5),
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
 				}),
 
 				Label = Roact_createElement(TextLabel, {
-					Text = "Visualize as:",
 					LayoutOrder = 1,
+					Text = "Visualize as:",
 					TextSize = 16,
 				}),
 
 				Dropdown = Roact_createElement(Dropdown, {
-					LayoutOrder = 2,
-					Size = UDim2.new(1, -75, 0, 30),
-					Options = {"None", "Icon", "Outline", "Box", "Sphere", "Text"},
 					CurrentOption = props.tagDrawType,
+					LayoutOrder = 2,
+					Options = {"None", "Icon", "Outline", "Box", "Sphere", "Text"},
+					Size = UDim2.new(1, -75, 0, 30),
 					onOptionSelected = function(option)
 						TagManager.Get():SetDrawType(props.tagMenu, option)
 					end,
@@ -190,7 +190,7 @@ local function mapStateToProps(state)
 	local drawType
 	local color
 	local alwaysOnTop = false
-	for _, v in pairs(state.TagData) do
+	for _, v in ipairs(state.TagData) do
 		if v.Name == state.TagMenu then
 			icon = v.Icon
 			drawType = v.DrawType or "Box"
@@ -200,11 +200,11 @@ local function mapStateToProps(state)
 	end
 
 	return {
-		tagMenu = state.TagMenu,
-		tagIcon = icon or "tag_green",
+		tagAlwaysOnTop = alwaysOnTop,
 		tagColor = color,
 		tagDrawType = drawType,
-		tagAlwaysOnTop = alwaysOnTop,
+		tagIcon = icon or "tag_green",
+		tagMenu = state.TagMenu,
 	}
 end
 
@@ -214,16 +214,16 @@ local function mapDispatchToProps(dispatch)
 			dispatch(Actions.OpenTagMenu(nil))
 		end,
 
-		iconPicker = function(tagMenu)
-			dispatch(Actions.ToggleIconPicker(tagMenu))
-		end,
-
 		colorPicker = function(tagMenu)
 			dispatch(Actions.ToggleColorPicker(tagMenu))
 		end,
 
 		groupPicker = function(tagMenu)
 			dispatch(Actions.ToggleGroupPicker(tagMenu))
+		end,
+
+		iconPicker = function(tagMenu)
+			dispatch(Actions.ToggleIconPicker(tagMenu))
 		end,
 
 		instanceView = function(tagMenu)

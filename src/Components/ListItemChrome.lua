@@ -13,26 +13,26 @@ local function ListItemChrome(props)
 	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
 			return Roact_createElement("TextButton", {
-				Size = UDim2.new(1, 0, 0, height),
 				AutoButtonColor = false,
-				LayoutOrder = props.LayoutOrder,
-				Visible = not props.hidden,
 				BackgroundColor3 = theme.Item[state],
 				BorderSizePixel = 0,
+				LayoutOrder = props.LayoutOrder,
+				Size = UDim2.new(1, 0, 0, height),
 				Text = "",
+				Visible = not props.hidden,
 
-				[Roact.Event.MouseEnter] = props.mouseEnter,
-				[Roact.Event.MouseLeave] = props.mouseLeave,
 				[Roact.Event.MouseButton1Click] = props.leftClick,
 				[Roact.Event.MouseButton2Click] = props.rightClick,
+				[Roact.Event.MouseEnter] = props.mouseEnter,
+				[Roact.Event.MouseLeave] = props.mouseLeave,
 			}, {
 				Divider = Roact_createElement("Frame", {
-					Visible = showDivider,
-					Size = UDim2.new(1, 0, 0, 1),
-					Position = UDim2.new(0.5, 0, 0, -1),
 					AnchorPoint = Vector2.new(0.5, 0),
-					BorderSizePixel = 0,
 					BackgroundColor3 = theme.Separator.Default,
+					BorderSizePixel = 0,
+					Position = UDim2.new(0.5, 0, 0, -1),
+					Size = UDim2.new(1, 0, 0, 1),
+					Visible = showDivider,
 				}),
 
 				Contents = child,

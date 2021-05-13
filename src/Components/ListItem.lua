@@ -43,10 +43,9 @@ function Item:render()
 
 	return Roact_createElement(ListItemChrome, {
 		LayoutOrder = props.LayoutOrder,
-		hidden = props.Hidden,
-		state = state.Name,
 		height = height,
-		showDivider = props.ShowDivider,
+		hidden = props.Hidden,
+		leftClick = props.leftClick,
 
 		mouseEnter = function()
 			self:setState({
@@ -60,24 +59,25 @@ function Item:render()
 			})
 		end,
 
-		leftClick = props.leftClick,
 		rightClick = props.rightClick,
+		showDivider = props.ShowDivider,
+		state = state.Name,
 	}, {
 		Roact_createElement(ThemeContext.Consumer, {
 			render = function(theme)
 				return Roact_createElement("Frame", {
-					Size = UDim2.fromScale(1, 1),
 					BackgroundTransparency = 1,
 					Position = UDim2.new(),
+					Size = UDim2.fromScale(1, 1),
 				}, {
 					TopElements = Roact_createElement("Frame", {
 						BackgroundTransparency = 1,
-						Size = UDim2.new(1, -indent, 0, 26),
 						Position = UDim2.fromOffset(indent, 0),
+						Size = UDim2.new(1, -indent, 0, 26),
 					}, {
 						Icon = props.Icon and Roact_createElement(Icon, {
-							Name = props.Icon,
 							AnchorPoint = Vector2.new(0.5, 0.5),
+							Name = props.Icon,
 							Position = UDim2.new(0, 24, 0.5, 0),
 						}),
 
@@ -106,34 +106,34 @@ function Item:render()
 						}, props.TextProps or {})),
 
 						Visibility = props.onSetVisible and Roact_createElement(Icon, {
+							AnchorPoint = Vector2.new(1, 0.5),
 							Name = props.Visible and "lightbulb" or "lightbulb_off",
 							Position = UDim2.new(1, -4, 0.5, 0),
-							AnchorPoint = Vector2.new(1, 0.5),
 							onClick = props.onSetVisible,
 						}),
 
 						Settings = props.onSettings and Roact_createElement(Icon, {
+							AnchorPoint = Vector2.new(1, 0.5),
 							Name = "cog",
 							Position = UDim2.new(1, -24, 0.5, 0),
-							AnchorPoint = Vector2.new(1, 0.5),
 
 							onClick = props.onSettings,
 						}),
 
 						Delete = props.onDelete and Roact_createElement(Icon, {
+							AnchorPoint = Vector2.new(1, 0.5),
 							Name = "cancel",
 							Position = UDim2.new(1, -4, 0.5, 0),
-							AnchorPoint = Vector2.new(1, 0.5),
 
 							onClick = props.onDelete,
 						}),
 					}),
 
 					Children = Roact_createElement("Frame", {
-						Size = UDim2.new(1, 0, 1, -26),
-						Position = UDim2.fromOffset(0, 26),
 						BackgroundColor3 = theme.MainBackground.Default,
 						BorderSizePixel = 0,
+						Position = UDim2.fromOffset(0, 26),
+						Size = UDim2.new(1, 0, 1, -26),
 					}, props[Roact.Children]),
 				})
 			end,

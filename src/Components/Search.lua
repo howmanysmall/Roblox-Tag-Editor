@@ -6,8 +6,8 @@ local Search = Roact.PureComponent:extend("Search")
 
 function Search:init()
 	self:setState({
-		hover = false,
 		focus = false,
+		hover = false,
 	})
 end
 
@@ -23,9 +23,9 @@ function Search:render()
 	end
 
 	return Roact_createElement("Frame", {
-		Size = props.Size,
-		Position = props.Position,
 		BackgroundTransparency = 1,
+		Position = props.Position,
+		Size = props.Size,
 	}, {
 		SearchBarContainer = Roact_createElement(ThemeContext.Consumer, {
 			render = function(theme)

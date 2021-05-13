@@ -11,19 +11,19 @@ local function Tag(props)
 	local isOpen = props.tagWithOpenMenu == props.Tag
 
 	return Roact_createElement(Item, {
-		Text = props.Tag,
+		Active = props.HasAll,
+		Height = isOpen and 171 or 26,
+		Hidden = props.Hidden,
 		Icon = props.Icon,
+		Indent = props.Group and 10 or 0,
 		IsInput = false,
 		LayoutOrder = props.LayoutOrder,
-		Visible = props.Visible,
-		Active = props.HasAll,
 		SemiActive = props.HasSome,
-		Hidden = props.Hidden,
-		Indent = props.Group and 10 or 0,
-		Height = isOpen and 171 or 26,
+		Text = props.Tag,
+		Visible = props.Visible,
 
-		onSetVisible = function()
-			TagManager.Get():SetVisible(props.Tag, not props.Visible)
+		leftClick = function()
+			TagManager.Get():SetTag(props.Tag, not props.HasAll)
 		end,
 
 		onSettings = function()
@@ -34,8 +34,8 @@ local function Tag(props)
 			end
 		end,
 
-		leftClick = function()
-			TagManager.Get():SetTag(props.Tag, not props.HasAll)
+		onSetVisible = function()
+			TagManager.Get():SetVisible(props.Tag, not props.Visible)
 		end,
 
 		rightClick = function()

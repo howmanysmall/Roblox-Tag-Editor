@@ -7,9 +7,9 @@ FamFamFam.Table = require(script.SpritesheetData)
 
 -- Returns a new ImageLabel object representing the icon.
 function FamFamFam.Create(name)
-	assert(typeof(name) == "string", "expected string name, got " .. typeof(name))
-	local data = FamFamFam.Table[name]
-	assert(data, "no such icon named `" .. name .. "`")
+	assert(type(name) == "string", "expected string name, got " .. typeof(name))
+	local data = assert(FamFamFam.Table[name], "no such icon named `" .. name .. "`")
+
 	local img = Instance.new("ImageLabel")
 	img.BackgroundTransparency = 1
 	img.Size = UDim2.fromOffset(16, 16)
@@ -23,9 +23,8 @@ end
 -- Returns a table with the keys Image, ImageRectOffset, and
 -- ImageRectSize which correspond to properties on ImageLabel.
 function FamFamFam.Lookup(name)
-	assert(typeof(name) == "string", "expected string name, got " .. typeof(name))
-	local data = FamFamFam.Table[name]
-	assert(data, "no such icon named `" .. name .. "`")
+	assert(type(name) == "string", "expected string name, got " .. typeof(name))
+	local data = assert(FamFamFam.Table[name], "no such icon named `" .. name .. "`")
 
 	return {
 		Image = FamFamFam.Asset,

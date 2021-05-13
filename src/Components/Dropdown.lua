@@ -12,15 +12,16 @@ local Roact_createElement = Roact.createElement
 
 -- TODO: Convert to context api
 
-local DropdownItem = function(props)
+local function DropdownItem(props)
 	return Roact_createElement(ListItem, {
 		ShowDivider = false,
 		Text = props.Text,
-		leftClick = props.leftClick,
-		ignoresMenuOpen = true,
 		TextProps = {
 			TextSize = 16,
 		},
+
+		ignoresMenuOpen = true,
+		leftClick = props.leftClick,
 	})
 end
 
@@ -47,8 +48,8 @@ function Dropdown:render()
 
 	for _, option in ipairs(props.Options) do
 		children[option] = Roact_createElement(DropdownItem, {
-			Text = option,
 			Height = 26,
+			Text = option,
 			leftClick = function()
 				self:setState({
 					open = false,
@@ -62,10 +63,17 @@ function Dropdown:render()
 	return Roact_createElement(ThemeContext.Consumer, {
 		render = function(theme)
 			return Roact_createElement(Button, {
-				Size = props.Size,
 				LayoutOrder = props.LayoutOrder,
 				Position = props.Position,
+				Size = props.Size,
 				Text = props.CurrentOption,
+
+				leftClick = function()
+					self:setState({
+						open = not state.open,
+					})
+				end,
+
 				[Roact.Event.Changed] = function(rbx)
 					local list = self._listRef.current
 
@@ -86,12 +94,6 @@ function Dropdown:render()
 						end
 					end
 				end,
-
-				leftClick = function()
-					self:setState({
-						open = not state.open,
-					})
-				end,
 			}, {
 				Portal = Roact_createElement(RootPortal, nil, {
 					OptionList = Roact_createElement(ScrollingFrame, {
@@ -108,11 +110,12 @@ function Dropdown:render()
 					AnchorPoint = Vector2.new(1, 0.5),
 					BackgroundTransparency = 1,
 					Image = ARROW_IMAGE,
-					Position = UDim2.new(1, -6, 0.5, 0),
-					Size = UDim2.fromOffset(12, 12),
+
 					-- FIXME: This needs a non-hardcoded icon color.
 					-- The studio theme API doesn't have a class for this :(
 					ImageColor3 = theme.ThemeName == "Light" and Color3.fromRGB(25, 25, 25) or Color3.fromRGB(242, 242, 242),
+					Position = UDim2.new(1, -6, 0.5, 0),
+					Size = UDim2.fromOffset(12, 12),
 				}),
 			})
 		end,

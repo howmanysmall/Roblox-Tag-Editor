@@ -33,16 +33,16 @@ function App:render()
 			Background = Roact_createElement(ThemeContext.Consumer, {
 				render = function(theme)
 					return Roact_createElement("Frame", {
-						Size = UDim2.fromScale(1, 1),
 						BackgroundColor3 = theme.MainBackground.Default,
+						Size = UDim2.fromScale(1, 1),
 						ZIndex = -100,
 					})
 				end,
 			}),
 
 			Container = Roact_createElement("Frame", {
-				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1),
 			}, {
 				UIListLayout = Roact_createElement("UIListLayout", {
 					SortOrder = Enum.SortOrder.LayoutOrder,
@@ -60,10 +60,10 @@ function App:render()
 				}),
 
 				UIPadding = Roact_createElement("UIPadding", {
+					PaddingBottom = UDim.new(0, 4),
 					PaddingLeft = UDim.new(0, 4),
 					PaddingRight = UDim.new(0, 4),
 					PaddingTop = UDim.new(0, 4),
-					PaddingBottom = UDim.new(0, 4),
 				}),
 
 				TagList = Roact_createElement(TagList, {
@@ -75,12 +75,12 @@ function App:render()
 				}),
 			}),
 
-			InstanceView = Roact_createElement(InstanceView),
+			ColorPicker = Roact_createElement(ColorPicker),
 			GroupPicker = Roact_createElement(GroupPicker),
 			IconPicker = Roact_createElement(IconPicker),
-			ColorPicker = Roact_createElement(ColorPicker),
-			WorldView = Roact_createElement(WorldView),
+			InstanceView = Roact_createElement(InstanceView),
 			TooltipView = Roact_createElement(TooltipView),
+			WorldView = Roact_createElement(WorldView),
 		}),
 	})
 end

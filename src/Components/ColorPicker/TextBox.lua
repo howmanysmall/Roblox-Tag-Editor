@@ -11,8 +11,8 @@ local Roact_createElement = Roact.createElement
 function TextBox:init()
 	self:setState({
 		hover = false,
-		press = false,
 		isValid = true,
+		press = false,
 	})
 end
 
@@ -37,26 +37,26 @@ function TextBox:render()
 			end
 
 			return Roact_createElement("Frame", {
-				Size = props.Size,
-				Position = props.Position,
 				BackgroundTransparency = 1,
 				LayoutOrder = props.LayoutOrder,
+				Position = props.Position,
+				Size = props.Size,
 			}, {
 				Label = props.Label and Roact_createElement("TextLabel", {
-					Text = props.Label,
-					Size = UDim2.fromOffset(inset, 20),
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextSize = 20,
-					Font = Enum.Font.SourceSans,
-					TextColor3 = theme.MainText.Default,
 					BackgroundTransparency = 1,
+					Font = Enum.Font.SourceSans,
+					Size = UDim2.fromOffset(inset, 20),
+					Text = props.Label,
+					TextColor3 = theme.MainText.Default,
+					TextSize = 20,
+					TextXAlignment = Enum.TextXAlignment.Left,
 				}) or nil,
 
 				Input = Roact_createElement("Frame", {
-					Size = UDim2.new(1, -inset, 1, 0),
-					Position = UDim2.fromOffset(inset, 0),
 					BackgroundColor3 = theme.InputFieldBackground.Default,
 					BorderColor3 = borderColor,
+					Position = UDim2.fromOffset(inset, 0),
+					Size = UDim2.new(1, -inset, 1, 0),
 
 					[Roact.Event.MouseEnter] = function()
 						self:setState({
@@ -71,26 +71,25 @@ function TextBox:render()
 					end,
 				}, {
 					TextBox = Roact_createElement("TextBox", {
-						Text = "",
-						PlaceholderText = props.Text,
-						PlaceholderColor3 = theme.DimmedText.Default,
-						Font = Enum.Font.SourceSans,
-						TextSize = 20,
-						TextColor3 = theme.MainText.Default,
-						Size = UDim2.new(1, -16, 1, 0),
 						AnchorPoint = Vector2.new(0.5, 0.5),
-						Position = UDim2.fromScale(0.5, 0.5),
 						BackgroundTransparency = 1,
+						Font = Enum.Font.SourceSans,
+						PlaceholderColor3 = theme.DimmedText.Default,
+						PlaceholderText = props.Text,
+						Position = UDim2.fromScale(0.5, 0.5),
+						Size = UDim2.new(1, -16, 1, 0),
+						Text = "",
+						TextColor3 = theme.MainText.Default,
+						TextSize = 20,
 						TextXAlignment = Enum.TextXAlignment.Left,
 
 						[Roact.Change.Text] = function(rbx)
 							local isValid = true
-
 							if rbx.Text ~= "" then
 								isValid = props.Validate(rbx.Text)
 							end
 
-							if isValid ~= self.state.isValid then
+							if isValid ~= state.isValid then
 								self:setState({
 									isValid = isValid,
 								})

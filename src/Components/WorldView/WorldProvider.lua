@@ -66,6 +66,7 @@ function WorldProvider:didMount()
 		local tag = manager.tags[name]
 		local wasVisible = self.trackedTags[name] ~= nil
 		local nowVisible = tag.DrawType ~= "None" and tag.Visible ~= false
+
 		if nowVisible and not wasVisible then
 			self:tagAdded(name)
 		elseif wasVisible and not nowVisible then
@@ -162,24 +163,40 @@ function WorldProvider:updateParts()
 	for _, new in ipairs(newList) do
 		local tags = CollectionService:GetTags(new.Instance)
 		local outlines = {}
+		local outlinesLength = 0
+
 		local boxes = {}
+		local boxesLength = 0
+
 		local icons = {}
+		local iconsLength = 0
+
 		local labels = {}
+		local labelsLength = 0
+
 		local spheres = {}
+		local spheresLength = 0
+
 		local anyAlwaysOnTop = false
+
 		for _, tagName in ipairs(tags) do
 			local tag = TagManager.Get().tags[tagName]
 			if self.trackedTags[tagName] and tag then
 				if tag.DrawType == "Outline" then
-					table.insert(outlines, tag.Color)
+					outlinesLength += 1
+					outlines[outlinesLength] = tag.Color
 				elseif tag.DrawType == "Box" then
-					table.insert(boxes, tag.Color)
+					boxesLength += 1
+					boxes[boxesLength] = tag.Color
 				elseif tag.DrawType == "Icon" then
-					table.insert(icons, tag.Icon)
+					iconsLength += 1
+					icons[iconsLength] = tag.Icon
 				elseif tag.DrawType == "Text" then
-					table.insert(labels, tagName)
+					labelsLength += 1
+					labels[labelsLength] = tagName
 				elseif tag.DrawType == "Sphere" then
-					table.insert(spheres, tag.Color)
+					spheresLength += 1
+					spheres[spheresLength] = tag.Color
 				end
 
 				if tag.AlwaysOnTop then
@@ -190,106 +207,98 @@ function WorldProvider:updateParts()
 
 		local partId = self.partIds[new.Instance]
 
-		if #outlines > 0 then
+		if outlinesLength > 0 then
 			local r, g, b = 0, 0, 0
 			for _, outline in ipairs(outlines) do
-				r = r + outline.R
-				g = g + outline.G
-				b = b + outline.B
+				r += outline.R
+				g += outline.G
+				b += outline.B
 			end
 
-			r = r / #outlines
-			g = g / #outlines
-			b = b / #outlines
+			r /= outlinesLength
+			g /= outlinesLength
+			b /= outlinesLength
 			local avg = Color3.new(r, g, b)
 			adornMap["Outline:" .. partId] = {
+				AlwaysOnTop = anyAlwaysOnTop,
+				Color = avg,
+				DrawType = "Outline",
 				Id = partId,
 				Part = new.Instance,
-				DrawType = "Outline",
-				Color = avg,
-				AlwaysOnTop = anyAlwaysOnTop,
 			}
 		end
 
-		if #boxes > 0 then
+		if boxesLength > 0 then
 			local r, g, b = 0, 0, 0
 			for _, box in ipairs(boxes) do
-				r = r + box.R
-				g = g + box.G
-				b = b + box.B
+				r += box.R
+				g += box.G
+				b += box.B
 			end
 
-			r = r / #boxes
-			g = g / #boxes
-			b = b / #boxes
+			r /= boxesLength
+			g /= boxesLength
+			b /= boxesLength
 			local avg = Color3.new(r, g, b)
 			adornMap["Box:" .. partId] = {
+				AlwaysOnTop = anyAlwaysOnTop,
+				Color = avg,
+				DrawType = "Box",
 				Id = partId,
 				Part = new.Instance,
-				DrawType = "Box",
-				Color = avg,
-				AlwaysOnTop = anyAlwaysOnTop,
 			}
 		end
 
-		if #icons > 0 then
+		if outlinesLength > 0 then
 			adornMap["Icon:" .. partId] = {
-				Id = partId,
-				Part = new.Instance,
+				AlwaysOnTop = anyAlwaysOnTop,
 				DrawType = "Icon",
 				Icon = icons,
-				AlwaysOnTop = anyAlwaysOnTop,
+				Id = partId,
+				Part = new.Instance,
 			}
 		end
 
-		if #labels > 0 then
+		if labelsLength > 0 then
 			table.sort(labels)
-			if #icons > 0 then
+			if iconsLength > 0 then
 				table.insert(labels, "")
 			end
 
 			adornMap["Text:" .. partId] = {
+				AlwaysOnTop = anyAlwaysOnTop,
+				DrawType = "Text",
 				Id = partId,
 				Part = new.Instance,
-				DrawType = "Text",
 				TagName = labels,
-				AlwaysOnTop = anyAlwaysOnTop,
 			}
 		end
 
-		if #spheres > 0 then
+		if spheresLength > 0 then
 			local r, g, b = 0, 0, 0
 			for _, sphere in ipairs(spheres) do
-				r = r + sphere.R
-				g = g + sphere.G
-				b = b + sphere.B
+				r += sphere.R
+				g += sphere.G
+				b += sphere.B
 			end
 
-			r = r / #spheres
-			g = g / #spheres
-			b = b / #spheres
+			r /= spheresLength
+			g /= spheresLength
+			b /= spheresLength
 			local avg = Color3.new(r, g, b)
 			adornMap["Sphere:" .. partId] = {
+				AlwaysOnTop = anyAlwaysOnTop,
+				Color = avg,
+				DrawType = "Sphere",
 				Id = partId,
 				Part = new.Instance,
-				DrawType = "Sphere",
-				Color = avg,
-				AlwaysOnTop = anyAlwaysOnTop,
 			}
 		end
 	end
 
 	-- make sure it's not the same as the current list
 	local isNew = false
-	local props = {
-		"Part",
-		"Icon",
-		"Id",
-		"DrawType",
-		"Color",
-		"TagName",
-		"AlwaysOnTop",
-	}
+	local props = {"Part", "Icon", "Id", "DrawType", "Color", "TagName", "AlwaysOnTop"}
 
 	local oldMap = self.state.partsList
 	for key, newValue in pairs(adornMap) do
@@ -431,9 +440,7 @@ end
 
 function WorldProvider:render()
 	local render = Roact_oneChild(self.props[Roact.Children])
-	local partsList = self.state.partsList
-
-	return render(partsList)
+	return render(self.state.partsList)
 end
 
 return WorldProvider

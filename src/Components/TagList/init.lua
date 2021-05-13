@@ -28,37 +28,39 @@ TagList.defaultProps = {
 
 local Roact_createElement = Roact.createElement
 
+local function sortTags(a, b)
+	local aGroup = a.Group or ""
+	local bGroup = b.Group or ""
+	if aGroup < bGroup then
+		return true
+	end
+
+	if bGroup < aGroup then
+		return false
+	end
+
+	local aName = a.Name or ""
+	local bName = b.Name or ""
+	return aName < bName
+end
+
 function TagList:render()
 	local props = self.props
+	local state = self.state
 
 	local function toggleGroup(group)
 		self:setState({
-			["Hide" .. group] = not self.state["Hide" .. group],
+			["Hide" .. group] = not state["Hide" .. group],
 		})
 	end
 
 	local tags = props.Tags
-	table.sort(tags, function(a, b)
-		local ag = a.Group or ""
-		local bg = b.Group or ""
-		if ag < bg then
-			return true
-		end
-
-		if bg < ag then
-			return false
-		end
-
-		local an = a.Name or ""
-		local bn = b.Name or ""
-
-		return an < bn
-	end)
+	table.sort(tags, sortTags)
 
 	local children = {
 		UIListLayout = Roact_createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 1),
+			SortOrder = Enum.SortOrder.LayoutOrder,
 
 			[Roact.Ref] = function(rbx)
 				if not rbx then
@@ -86,19 +88,19 @@ function TagList:render()
 		if tag.Group ~= lastGroup then
 			lastGroup = tag.Group
 			children["Group" .. groupName] = Roact_createElement(Group, {
-				Name = groupName,
+				Hidden = state["Hide" .. groupName],
 				LayoutOrder = itemCount,
+				Name = groupName,
 				toggleHidden = toggleGroup,
-				Hidden = self.state["Hide" .. groupName],
 			})
 
 			itemCount = itemCount + 1
 		end
 
 		children[tag.Name] = Roact_createElement(Tag, merge(tag, {
-			Hidden = self.state["Hide" .. groupName],
-			Tag = tag.Name,
+			Hidden = state["Hide" .. groupName],
 			LayoutOrder = itemCount,
+			Tag = tag.Name,
 		}))
 
 		itemCount = itemCount + 1
@@ -106,10 +108,10 @@ function TagList:render()
 
 	for _, tag in ipairs(props.unknownTags) do
 		children[tag] = Roact_createElement(Item, {
-			Text = string.format("%s (click to import)", tag),
-			Icon = "help",
 			ButtonColor = Constants.LightRed,
+			Icon = "help",
 			LayoutOrder = itemCount,
+			Text = string.format("%s (click to import)", tag),
 			TextProps = {
 				Font = Enum.Font.SourceSansItalic,
 			},
@@ -119,28 +121,28 @@ function TagList:render()
 			end,
 		})
 
-		itemCount = itemCount + 1
+		itemCount += 1
 	end
 
 	if #tags == 0 then
 		children.NoResults = Roact_createElement(Item, {
+			Icon = "cancel",
 			LayoutOrder = itemCount,
 			Text = "No search results found.",
-			Icon = "cancel",
 			TextProps = {
 				Font = Enum.Font.SourceSansItalic,
 			},
 		})
 
-		itemCount = itemCount + 1
+		itemCount += 1
 	end
 
 	local searchTagExists = table.find(tags, props.searchTerm) ~= nil
 	if props.searchTerm and #props.searchTerm > 0 and not searchTagExists then
 		children.AddNew = Roact_createElement(Item, {
+			Icon = "tag_blue_add",
 			LayoutOrder = itemCount,
 			Text = string.format("Add tag %q...", props.searchTerm),
-			Icon = "tag_blue_add",
 
 			leftClick = function()
 				TagManager.Get():AddTag(props.searchTerm)
@@ -149,10 +151,10 @@ function TagList:render()
 		})
 	else
 		children.AddNew = Roact_createElement(Item, {
-			LayoutOrder = itemCount,
-			Text = "Add new tag...",
 			Icon = "tag_blue_add",
 			IsInput = true,
+			LayoutOrder = itemCount,
+			Text = "Add new tag...",
 
 			onSubmit = function(_, text)
 				TagManager.Get():AddTag(text)
@@ -187,9 +189,9 @@ local function mapStateToProps(state)
 	end
 
 	return {
-		Tags = tags,
-		searchTerm = state.Search,
 		menuOpen = state.TagMenu,
+		searchTerm = state.Search,
+		Tags = tags,
 		unknownTags = unknownTags,
 	}
 end

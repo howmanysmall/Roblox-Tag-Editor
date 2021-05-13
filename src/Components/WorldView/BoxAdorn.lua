@@ -7,18 +7,18 @@ local function BoxAdorn(props)
 		return Roact_createElement("BoxHandleAdornment", {
 			Adornee = adornee.Parent,
 			CFrame = adornee.CFrame,
+			Color3 = props.Color,
 			Size = Vector3.new(1.2, 1.2, 1.2),
 			Transparency = 0.3,
-			Color3 = props.Color,
 		})
 	end
 
 	return Roact_createElement("SelectionBox", {
-		LineThickness = 0.03,
-		SurfaceTransparency = 0.7,
-		SurfaceColor3 = props.Color,
 		Adornee = adornee,
 		Color3 = props.Color,
+		LineThickness = 0.03,
+		SurfaceColor3 = props.Color,
+		SurfaceTransparency = 0.7,
 	})
 end
 
